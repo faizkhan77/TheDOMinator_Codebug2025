@@ -10,11 +10,11 @@ from .views import (
     login_view,
     signup_view,
     kick_member_from_team,
-    # InvitationViewSet,
+    InvitationViewSet,
     # recommend_teams,
     # recommend_users,
     UserSkillViewSet,
-    # JoinRequestViewSet,
+    JoinRequestViewSet,
 )
 
 
@@ -26,6 +26,8 @@ router.register(r"teams", TeamViewSet, basename="team")
 # router.register(r"rooms", RoomViewSet, basename="room")
 # router.register(r"messages", MessageViewSet, basename="message")
 router.register(r"skills", UserSkillViewSet, basename="skill")
+router.register(r"invitations", InvitationViewSet, basename="invitation")
+router.register(r"join-requests", JoinRequestViewSet, basename="join-request")
 
 from rest_framework_simplejwt.views import TokenRefreshView
 

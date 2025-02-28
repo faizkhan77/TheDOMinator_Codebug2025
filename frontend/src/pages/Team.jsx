@@ -48,22 +48,78 @@ const Team = () => {
         const token = localStorage.getItem("access");
         if (!token) {
             console.error("No access token found.");
+            alert("You must be logged in to join a team.");
+            btnsetLoading(false);
             return;
         }
 
         try {
-            // Send the join request for private teams
-            await sendJoinRequest();
-
-            // Optionally, you can set an intermediate loading state or feedback here
-            alert("Join request sent. Please wait for admin approval.");
-
+            if (team.team_type === "PUBLIC") {
+                // Directly join public teams
+                await joinPublicTeam();
+                alert("You have successfully joined the team!");
+            } else {
+                // Send a join request for private teams (this won't be reached due to early return above)
+                await sendJoinRequest();
+                alert("Join request sent. Please wait for admin approval.");
+            }
         } catch (error) {
             console.error("Error joining team:", error.response?.data || error.message);
+            alert("Failed to join the team. Please try again.");
         }
 
+        
         btnsetLoading(false);
     };
+
+    const joinPublicTeam = async () => {
+        const token = localStorage.getItem("access");
+    
+        try {
+            // Send request to join the public team
+            await axios.post(
+                `/api/teams/${team.id}/join/`, 
+                {}, 
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+    
+            // ✅ Fetch and update myTeams after joining
+            await fetchAndUpdateMyTeams();
+    
+            alert("You have successfully joined the team!");
+        } catch (error) {
+            console.error("Failed to join public team:", error.response?.data || error.message);
+            alert(error.response?.data?.detail || "Failed to join the team. Please try again.");
+        }
+    };
+
+    const fetchAndUpdateMyTeams = async () => {
+        const token = localStorage.getItem("access");
+        const userProfile = JSON.parse(localStorage.getItem("userProfile")); // ✅ Get user profile
+        const userTeamIds = userProfile?.teams || []; // ✅ Extract team IDs
+    
+        try {
+            const response = await axios.get("/api/teams/", {
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
+    
+            // ✅ Store all teams in localStorage
+            localStorage.setItem("teams", JSON.stringify(response.data));
+    
+            // ✅ Filter out the teams the user is part of
+            const myTeams = response.data.filter(team => userTeamIds.includes(team.id));
+            localStorage.setItem("myTeams", JSON.stringify(myTeams)); // ✅ Store filtered teams
+    
+        } catch (error) {
+            console.error("Failed to fetch teams:", error);
+        }
+    };
+    
+    
+    
 
     const sendJoinRequest = async () => {
         const token = localStorage.getItem("access");

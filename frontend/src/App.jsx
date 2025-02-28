@@ -7,7 +7,7 @@ import LoggedinHome from './pages/LoggedinHome';
 import Login from "./pages/Login"
 import Teams from './pages/Teams';
 import Team from './pages/Team';
-// import TeamEdit from './pages/TeamEdit';
+import TeamEdit from './pages/TeamEdit';
 // import Chat from './pages/Chat';
 import Signin from './pages/Signin';
 import CreateProfile from './pages/CreateProfile';
@@ -17,9 +17,9 @@ import UserProfile from './pages/userProfile';
 
 import { AuthProvider } from './AuthContext';
 import Activities from './components/Activities';
-// import ActivitiesPage from './pages/ActivitiesPage';
-// import MyTeams from './pages/MyTeams';
-// import Invitations from './pages/Invitations';
+import ActivitiesPage from './pages/ActivitiesPage';
+import MyTeams from './pages/MyTeams';
+import Invitations from './pages/Invitations';
 
 // import RecommendedContent from './pages/RecommendedContent';
 // import SkillAssessmentPage from './components/SkillAssessmentPage';
@@ -43,18 +43,18 @@ const App = () => {
             <Route path="/signin" element={<Signin />} />
             <Route path="/login" element={<Login />} />
             <Route path="/userslist" element={<UsersList />} />
-            {/* <Route path="/activities" element={<ActivitiesPage />} /> */}
+            <Route path="/activities" element={<ActivitiesPage />} />
             <Route path="/create-profile" element={<CreateProfile />} />
             <Route path="/editprofile" element={<EditProfile />} />
             <Route path="/user/:id" element={<UserProfile />} />
             <Route path="/about" element={<About />} />
             <Route path='/teams' element={<Teams />} />
             <Route path='/team/:id' element={<Team />} />
-            {/* <Route path="/team/new" element={<TeamEdit />} /> 
+            <Route path="/team/new" element={<TeamEdit />} /> 
             <Route path="/team/edit/:id" element={<TeamEdit />} />  
             <Route path='/myteams' element={<MyTeams />} />
-            <Route path="/chat/:chatroomId" element={<Chat />} />
-            <Route path='/invitations' element={<Invitations />} /> */}
+            {/* <Route path="/chat/:chatroomId" element={<Chat />} /> */}
+            <Route path='/invitations' element={<Invitations />} />
             {/* <Route path="/recommended-content" element={<RecommendedContent />} />
             <Route path="/assessment/:skill" element={<SkillAssessmentPage />} /> */}
 
