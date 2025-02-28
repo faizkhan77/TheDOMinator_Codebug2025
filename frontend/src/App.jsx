@@ -12,7 +12,7 @@ import Teams from './pages/Teams';
 import Signin from './pages/Signin';
 import CreateProfile from './pages/CreateProfile';
 // import EditProfile from './pages/EditProfile';
-// import UsersList from './pages/UsersList';
+import UsersList from './pages/UsersList';
 import UserProfile from './pages/userProfile';
 
 import { AuthProvider } from './AuthContext';
@@ -42,7 +42,7 @@ const App = () => {
             <Route path="/contact" element={<Contact />} />
             <Route path="/signin" element={<Signin />} />
             <Route path="/login" element={<Login />} />
-            {/* <Route path="/userslist" element={<UsersList />} /> */}
+            <Route path="/userslist" element={<UsersList />} />
             {/* <Route path="/activities" element={<ActivitiesPage />} /> */}
             <Route path="/create-profile" element={<CreateProfile />} />
             {/* <Route path="/editprofile" element={<EditProfile />} /> */}
