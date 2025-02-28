@@ -1,12 +1,13 @@
 :root {
-    --background: #9c88ff;
+    --background: #0a0a0a;
     --navbar-width: 256px;
     --navbar-width-min: 80px;
-    --navbar-dark-primary: #18283b;
-    --navbar-dark-secondary: #2c3e50;
-    --navbar-light-primary: #f5f6fa;
-    --navbar-light-secondary: #8392a5;
+    --navbar-dark-primary: #141414;
+    --navbar-dark-secondary: #0a0a0a;
+    --navbar-light-primary: #ffffff;
+    --navbar-light-secondary: #ffffff;
 }
+
 
 
 .sidebar {
@@ -68,7 +69,7 @@
 }
 
 #nav-bar {
-    position: absolute;
+    position: fixed; /* Changed from absolute to fixed */
     left: 1vw;
     top: 1vw;
     height: calc(100% - 2vw);
@@ -81,6 +82,7 @@
     overflow: hidden;
     user-select: none;
 }
+
 
 #nav-bar hr {
     margin: 0;
@@ -195,7 +197,7 @@ label[for="nav-toggle"] {
     top: -70px;
     width: calc(100% - 16px);
     height: 54px;
-    background: var(--background);
+    background: white;
     background-attachment: fixed;
     border-radius: 16px 0 0 16px;
     transition: top .2s;
@@ -394,5 +396,5 @@ label[for="nav-footer-toggle"] {
 
 #nav-footer-content::-webkit-scrollbar-thumb {
     border-radius: 99px;
-    background-color: #D62929;
+    /* background-color: #D62929; */
 }
