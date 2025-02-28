@@ -157,12 +157,12 @@ class Room(models.Model):
     members = models.ManyToManyField(User, related_name="chatrooms", blank=True)
     created = models.DateTimeField(auto_now_add=True)
 
-    # def add_message(self, user, content):
-    #     """Function to send a message in the chatroom."""
-    #     if user in self.members.all():
-    #         Message.objects.create(room=self, sender=user, content=content)
-    #     else:
-    #         raise ValueError("User must be a member of the chatroom to send messages.")
+    def add_message(self, user, content):
+        """Function to send a message in the chatroom."""
+        if user in self.members.all():
+            Message.objects.create(room=self, sender=user, content=content)
+        else:
+            raise ValueError("User must be a member of the chatroom to send messages.")
     
 class Message(models.Model):
     """Chat messages"""

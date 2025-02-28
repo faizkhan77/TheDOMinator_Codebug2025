@@ -9,7 +9,7 @@ from .views import (
     getRoutes,
     login_view,
     signup_view,
-    # kick_member_from_team,
+    kick_member_from_team,
     # InvitationViewSet,
     # recommend_teams,
     # recommend_users,
@@ -36,6 +36,7 @@ urlpatterns = [
     path("", include(router.urls)),
     path("login/", login_view, name="login"),
     path("signup/", signup_view, name="signup"),
+     path("teams/<int:team_id>/kick/", kick_member_from_team, name="kick-member"),
     path(
         "token/refresh/", TokenRefreshView.as_view(), name="token_refresh"
     ),  #  (to refresh JWT tokens)

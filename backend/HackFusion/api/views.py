@@ -9,6 +9,9 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from django.core.exceptions import ObjectDoesNotExist
 from .models import UserProfile, Team, Room, Message, Invitation, UserSkill, JoinRequest
 from .serializers import (
     UserSerializer,
@@ -473,3 +476,52 @@ class MessageViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """Set sender automatically from authenticated user"""
         serializer.save(sender=self.request.user)
+
+
+@api_view(["POST"])
+def kick_member_from_team(request, team_id):
+    """Kick a member from the team (only accessible by the admin)."""
+    if not request.user.is_authenticated:
+        return Response(
+            {"detail": "Authentication required."}, status=status.HTTP_401_UNAUTHORIZED
+        )
+
+    team = get_object_or_404(Team, id=team_id)
+    member_id = request.data.get("memberId")
+
+    print(f"Received memberId: {member_id}")  # Debugging line
+
+    # Ensure the requesting user is the admin of the team
+    if team.admin.id != request.user.id:
+        return Response(
+            {"detail": "You do not have permission to kick members."},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    try:
+        member = User.objects.get(id=member_id)
+        print(f"Member found: {member.username}")  # Debugging line
+    except ObjectDoesNotExist:
+        return Response(
+            {"detail": "Member does not exist."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    # Check if the member is actually in the team
+    if member not in team.members.all():
+        return Response(
+            {"detail": "Member not found in the team."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    # Remove the member from the team
+    team.members.remove(member)
+
+    # Update the member's profile by removing the team ID
+    profile = get_object_or_404(UserProfile, user=member)
+    profile.teams.remove(team)  # Remove the team from the user's profile
+    profile.save()
+
+    return Response(
+        {"detail": "Member kicked successfully."}, status=status.HTTP_200_OK
+    )
