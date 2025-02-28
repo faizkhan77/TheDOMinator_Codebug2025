@@ -9,14 +9,16 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
-from .models import UserProfile, Team, Room, UserSkill
+from .models import UserProfile, Team, Room, Message, Invitation, UserSkill, JoinRequest
 from .serializers import (
     UserSerializer,
     UserProfileSerializer,
     TeamSerializer,
     RoomSerializer,
     MessageSerializer,
+    InvitationSerializer,
     UserSkillSerializer,
+    JoinRequestSerializer,
 )
 
 # Create your views here.
@@ -281,6 +283,158 @@ class TeamViewSet(viewsets.ModelViewSet):
             {"detail": "You have left the team."}, status=status.HTTP_200_OK
         )
 
+class InvitationViewSet(viewsets.ModelViewSet):
+    queryset = Invitation.objects.all()
+    serializer_class = InvitationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def create(self, request):
+        """Send an invitation to a user for a specific team."""
+        sender = request.user
+        recipient_id = request.data.get("recipient_id")
+        team_id = request.data.get("team_id")
+
+        # Ensure sender is in the team
+        team = Team.objects.filter(id=team_id, members=sender).first()
+        if not team:
+            return Response(
+                {"detail": "You are not a member of this team."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        recipient = User.objects.filter(id=recipient_id).first()
+        if not recipient:
+            return Response(
+                {"detail": "Recipient not found."}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Check if the invitation already exists
+        if Invitation.objects.filter(
+            sender=sender, recipient=recipient, team=team, status="pending"
+        ).exists():
+            return Response(
+                {"detail": "An invitation is already pending."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Create invitation
+        invitation = Invitation.objects.create(
+            sender=sender, recipient=recipient, team=team
+        )
+        return Response(
+            InvitationSerializer(invitation).data, status=status.HTTP_201_CREATED
+        )
+
+    @action(detail=True, methods=["post"])
+    def respond(self, request, pk=None):
+        """Accept or reject an invitation."""
+        invitation = self.get_object()
+
+        if invitation.recipient != request.user:
+            return Response(
+                {"detail": "You are not allowed to respond to this invitation."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        action = request.data.get("action")
+
+        if action == "accept":
+            invitation.team.members.add(invitation.recipient)  # Add user to team
+            message = "You have joined the team!"
+        elif action == "reject":
+            message = "Invitation rejected."
+        else:
+            return Response(
+                {"detail": "Invalid action."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # **Delete the invitation after responding**
+        invitation.delete()
+
+        return Response({"detail": message}, status=status.HTTP_200_OK)
+
+
+class JoinRequestViewSet(viewsets.ModelViewSet):
+    queryset = JoinRequest.objects.all()
+    serializer_class = JoinRequestSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def create(self, request):
+        """Allow a user to request to join a private team."""
+        user = request.user
+        team_id = request.data.get("team_id")
+
+        # Check if team exists
+        team = get_object_or_404(Team, id=team_id)
+
+        # Prevent sending request if already a member
+        if team.members.filter(id=user.id).exists():
+            return Response(
+                {"detail": "You are already a member of this team."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Only allow requests for private teams
+        if team.team_type != "PRIVATE":
+            return Response(
+                {"detail": "Join requests are only allowed for private teams."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        # Prevent duplicate requests
+        if JoinRequest.objects.filter(user=user, team=team, status="pending").exists():
+            return Response(
+                {"detail": "Join request already pending."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Create join request
+        join_request = JoinRequest.objects.create(user=user, team=team)
+        return Response(
+            JoinRequestSerializer(join_request).data, status=status.HTTP_201_CREATED
+        )
+
+    @action(detail=True, methods=["post"])
+    def respond(self, request, pk=None):
+        """Allow the team admin to accept or reject a join request."""
+        join_request = get_object_or_404(JoinRequest, id=pk)
+
+        # Only the team admin can accept/reject requests
+        if join_request.team.admin != request.user:
+            return Response(
+                {"detail": "Only the team admin can respond to requests."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        action = request.data.get("action")
+
+        if action == "accept":
+            if join_request.team.members.count() < join_request.team.members_limit:
+                join_request.team.members.add(join_request.user)
+
+                # Update UserProfile to add this team
+                user_profile, created = UserProfile.objects.get_or_create(
+                    user=join_request.user
+                )
+                user_profile.teams.add(join_request.team)
+                user_profile.save()
+
+                message = "User has been added to the team."
+            else:
+                return Response(
+                    {"detail": "Team is full."}, status=status.HTTP_400_BAD_REQUEST
+                )
+
+        elif action == "reject":
+            message = "Join request rejected."
+        else:
+            return Response(
+                {"detail": "Invalid action."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Delete request after responding
+        join_request.delete()
+        return Response({"detail": message}, status=status.HTTP_200_OK)
 
 
 
@@ -302,3 +456,20 @@ class RoomViewSet(viewsets.ModelViewSet):
         return Response(
             MessageSerializer(messages, many=True).data, status=status.HTTP_200_OK
         )
+
+class MessageViewSet(viewsets.ModelViewSet):
+    """Handles CRUD for chat messages"""
+
+    serializer_class = MessageSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        """Filter messages based on room ID"""
+        room_id = self.request.query_params.get("room")  # Get 'room' from query params
+        if room_id:
+            return Message.objects.filter(room_id=room_id).order_by("timestamp")
+        return Message.objects.none()  # Return empty if no room ID provided
+
+    def perform_create(self, serializer):
+        """Set sender automatically from authenticated user"""
+        serializer.save(sender=self.request.user)
