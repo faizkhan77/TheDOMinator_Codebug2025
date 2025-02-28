@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import  Contact  from './pages/Contact';
 import Home from './Home';
 import About from './pages/About';
-// import LoggedinHome from './pages/LoggedinHome';
+import LoggedinHome from './pages/LoggedinHome';
 import Login from "./pages/Login"
 // import Teams from './pages/Teams';
 // import Team from './pages/Team';
@@ -34,11 +34,11 @@ const App = () => {
 
           <Routes>
             <Route path="/" element={<Home />} />
-            {/* <Route path="/loggedinhome" element={
+            <Route path="/loggedinhome" element={
 
               <LoggedinHome />
 
-            } /> */}
+            } />
             <Route path="/contact" element={<Contact />} />
             <Route path="/signin" element={<Signin />} />
             <Route path="/login" element={<Login />} />
