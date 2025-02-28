@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { FaGithub, FaFacebook, FaInstagram, FaLinkedin, FaGlobe } from "react-icons/fa"; // Import icons
 import LoggedinNav from "../components/LoggedinNav";
 import SkillAssessmentModal from "../components/SkillAssessmentModal";
+import "./Scrollbar.css"
 
 const UserProfile = () => {
     const [user, setUser] = useState(null)
