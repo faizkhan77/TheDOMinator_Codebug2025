@@ -115,29 +115,30 @@ const UserProfile = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Profile Card */}
                 <div className="bg-[#141414] rounded-2xl shadow-lg p-6 w-full">
-                  <div className="flex flex-col items-center text-center">
-                    <img
-                      src={profile?.avatar}
-                      alt="User Avatar"
-                      className="rounded-full w-36 md:w-48 border-4 border-gray-500 mb-4"
-                    />
-                    <h4 className="text-2xl font-semibold text-white">{profile?.full_name}</h4>
-                    <p className="text-gray-400 text-lg">{profile?.role}</p>
-                    <p className="text-gray-500 text-sm">{profile?.location}</p>
-                  </div>
-      
-                  {/* Edit Button */}
-                  {loggedInUser?.id === profile?.user && (
-                    <div className="mt-4 text-center">
-                      <button
-                        onClick={handleEditProfile}
-                        className="bg-white text-black px-6 py-2 rounded-lg hover:bg-gray-300"
-                      >
-                        Edit Profile
-                      </button>
-                    </div>
-                  )}
-                </div>
+  <div className="flex flex-col items-center text-center">
+    <img
+      src={profile?.avatar}
+      alt="User Avatar"
+      className="rounded-full w-36 md:w-48 border-4 border-gray-500 mb-4 object-cover h-36 md:h-48"
+    />
+    <h4 className="text-2xl font-semibold text-white">{profile?.full_name}</h4>
+    <p className="text-gray-400 text-lg">{profile?.role}</p>
+    <p className="text-gray-500 text-sm">{profile?.location}</p>
+  </div>
+
+  {/* Edit Button */}
+  {loggedInUser?.id === profile?.user && (
+    <div className="mt-4 text-center">
+      <button
+        onClick={handleEditProfile}
+        className="bg-white text-black px-6 py-2 rounded-lg hover:bg-gray-300"
+      >
+        Edit Profile
+      </button>
+    </div>
+  )}
+</div>
+
       
                 {/* Profile Details */}
                 <div className="bg-[#141414] rounded-2xl shadow-lg p-6 w-full">
@@ -161,27 +162,29 @@ const UserProfile = () => {
                       <p className="text-gray-400">{profile?.role}</p>
                     </div>
       
-                    <div className="bg-[#0a0a0a] rounded-lg p-4 mt-4 max-h-48 overflow-y-auto">
+                   
+                    <div className="bg-[#0a0a0a] rounded-lg  p-4 mt-4 max-h-72 overflow-y-auto">
                       <h6 className="text-white text-lg font-semibold mb-3">Skills</h6>
                       {profile?.skills && profile.skills.length > 0 ? (
                         profile.skills.map((skill) => (
-                          <div key={skill.id} className="flex justify-between items-center mb-2 bg-gray-700 p-2 rounded-md">
-                            <span className="text-gray-300">{skill.skill_name}</span>
+                          <div key={skill.id} className="flex bg-[#141414] justify-between items-center mb-2  p-2 rounded-md">
+                            <span className="text-gray-300 ">{skill.skill_name}</span>
                             <div className="flex items-center space-x-2">
-                              {skill.verified && (
-                                <span className="flex items-center bg-gray-500 text-white text-xs font-semibold py-1 px-3 rounded-full">
-                                  <i className="fas fa-check-circle mr-2"></i> Verified
-                                </span>
-                              )}
-                              {loggedInUserProfile?.id === skill.user_profile && !skill.verified && (
-                                <button
-                                  onClick={() => openModal(skill)}
-                                  className="bg-white text-black px-3 py-1 rounded hover:bg-gray-300"
-                                >
-                                  Verify
-                                </button>
-                              )}
-                            </div>
+  {skill.verified && (
+    <span className="flex items-center bg-[#FFD700] text-[#141414] text-xs font-semibold py-1 px-3 rounded-full">
+      <i className="fas fa-check-circle mr-2"></i> Verified
+    </span>
+  )}
+  {loggedInUserProfile?.id === skill.user_profile && !skill.verified && (
+    <button
+      onClick={() => openModal(skill)}
+      className="bg-white text-[#0a0a0a] px-3 py-1 rounded hover:bg-[#e5e5e5]"
+    >
+      Verify
+    </button>
+  )}
+</div>
+
                           </div>
                         ))
                       ) : (
