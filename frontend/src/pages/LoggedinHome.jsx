@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../AuthContext";
 import { useNavigate } from "react-router-dom";
 import Activities from "../components/Activities";
-// import TeamList from "../components/TeamList";
-// import RolesandSkills from "../components/RolesandSkills";
+import TeamList from "../components/TeamList";
+import RolesandSkills from "../components/RolesandSkills";
 import Sidebar from "../components/Sidebar";
 import LoggedinNav from "../components/LoggedinNav";
 import axios from "axios";
@@ -73,44 +73,46 @@ const LoggedinHome = () => {
   };
 
   return (
-    <div className="bg-gray-900 text-white min-h-screen">
-      {/* Navbar: full width on small screens */}
-      <div className="md:hidden w-full">
-        <LoggedinNav />
+    <div className="bg-[#0a0a0a] text-white sm:ml-4 min-h-screen">
+    {/* Navbar: full width on small screens */}
+    <div className="md:hidden w-full">
+      <LoggedinNav />
+    </div>
+  
+    <div className="flex">
+      {/* Sidebar: visible only on medium (md) screens and up */}
+      <div
+        className={`hidden md:block transition-all duration-300 ${
+          isSidebarOpen ? "w-1/5" : "w-0"
+        } bg-[#141414]`}
+        style={{ overflow: "hidden" }}
+      >
+        <Sidebar toggleSidebar={toggleSidebar} />
       </div>
-
-      <div className="flex">
-        {/* Sidebar: visible only on medium (md) screens and up */}
-        <div
-          className={`hidden md:block transition-all duration-300 ${isSidebarOpen ? "w-1/5 " : "w-0"
-            }`}
-          style={{ overflow: "hidden" }}
-        >
-          <Sidebar toggleSidebar={toggleSidebar} />
-        </div>
-
-        {/* Main Content Area */}
-        <div className="flex-1 p-6 lg:p-8">
-          {/* For small and medium screens, stack columns vertically. On large screens, show as a row with spacing */}
-          <div className="flex flex-col lg:flex-row lg:space-x-8 space-y-6 lg:space-y-0">
-            {/* Left Column - Roles and Skills */}
-            {/* <div className="w-full lg:w-1/4">
-              <RolesandSkills setSearchQuery={setSearchQuery} />
-            </div> */}
-
-            {/* Middle Column - TeamList */}
-            {/* <div className="w-full lg:w-1/2">
-              <TeamList searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-            </div> */}
-
-            {/* Right Column - Activities */}
-            <div className="w-full lg:w-1/4">
-              <Activities />
-            </div>
+  
+      {/* Main Content Area */}
+      <div className="flex-1 p-6 lg:p-8">
+        {/* For small and medium screens, stack columns vertically. On large screens, show as a row with spacing */}
+        <div className="flex flex-col lg:flex-row lg:space-x-8 space-y-6 lg:space-y-0">
+          {/* Left Column - Roles and Skills */}
+          <div className="w-full ml-4 lg:w-1/4 bg-[#0a0a0a] p-4 rounded-lg">
+            <RolesandSkills setSearchQuery={setSearchQuery} />
+          </div>
+  
+          {/* Middle Column - TeamList */}
+          <div className="w-full lg:w-1/2 bg-[#0a0a0a] p-4 rounded-lg">
+            <TeamList searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+          </div>
+  
+          {/* Right Column - Activities */}
+          <div className="w-full lg:w-1/4 bg-[#0a0a0a] p-4 rounded-lg">
+            <Activities />
           </div>
         </div>
       </div>
     </div>
+  </div>
+  
   );
 };
 
