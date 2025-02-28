@@ -1,0 +1,23 @@
+import styles from "../style";
+import Button from "./Button";
+import { useNavigate } from "react-router-dom";
+
+const CTA = () => {
+  const navigate = useNavigate()
+  return (
+    <section className={`${styles.flexCenter} ${styles.marginY} ${styles.padding} sm:flex-row flex-col bg-black-gradient-2 rounded-[20px] box-shadow`}>
+      <div className="flex-1 flex flex-col">
+        <h2 className={styles.heading2}>Join us and start exploring!</h2>
+        <p className={`${styles.paragraph} max-w-[470px] mt-5`}>
+          Discover the power of seamless collaboration and innovation. Start your journey today and see how easy it is to create something amazing!
+        </p>
+      </div>
+
+      <div className={`${styles.flexCenter} sm:ml-10 ml-0 sm:mt-0 mt-10`} onClick={() => navigate("/login")}>
+        <Button />
+      </div>
+    </section>
+  )
+};
+
+export default CTA;
