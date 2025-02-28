@@ -96,6 +96,51 @@ class Team(models.Model):
         return self.name
 
 
+class Invitation(models.Model):
+    sender = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="sent_invitations"
+    )
+    recipient = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="received_invitations"
+    )
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="invitations")
+    status = models.CharField(
+        max_length=10,
+        choices=[
+            ("pending", "Pending"),
+            ("accepted", "Accepted"),
+            ("rejected", "Rejected"),
+        ],
+        default="pending",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.sender} invited {self.recipient} to {self.team.name} ({self.status})"
+
+
+class JoinRequest(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="join_requests"
+    )
+    team = models.ForeignKey(
+        Team, on_delete=models.CASCADE, related_name="join_requests"
+    )
+    status = models.CharField(
+        max_length=10,
+        choices=[
+            ("pending", "Pending"),
+            ("accepted", "Accepted"),
+            ("rejected", "Rejected"),
+        ],
+        default="pending",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} -> {self.team.name} ({self.status})"
+
+
 
 class Room(models.Model):
     # ROOM_TYPES = [
