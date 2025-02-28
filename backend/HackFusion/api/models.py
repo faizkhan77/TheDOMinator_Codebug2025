@@ -118,3 +118,11 @@ class Room(models.Model):
     #         Message.objects.create(room=self, sender=user, content=content)
     #     else:
     #         raise ValueError("User must be a member of the chatroom to send messages.")
+    
+class Message(models.Model):
+    """Chat messages"""
+
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="messages")
+    sender = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)

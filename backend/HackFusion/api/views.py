@@ -15,8 +15,8 @@ from .serializers import (
     UserProfileSerializer,
     TeamSerializer,
     RoomSerializer,
-    # MessageSerializer,
-    # UserSkillSerializer,
+    MessageSerializer,
+    UserSkillSerializer,
 )
 
 # Create your views here.
@@ -286,19 +286,19 @@ class TeamViewSet(viewsets.ModelViewSet):
 
 
 
-# # ✅ Room (Chatroom) ViewSet
-# class RoomViewSet(viewsets.ModelViewSet):
-#     queryset = Room.objects.all()
-#     serializer_class = RoomSerializer
-#     permission_classes = [permissions.IsAuthenticated]
+# ✅ Room (Chatroom) ViewSet
+class RoomViewSet(viewsets.ModelViewSet):
+    queryset = Room.objects.all()
+    serializer_class = RoomSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-#     @action(detail=True, methods=["get"])
-#     def messages(self, request, pk=None):
-#         """Fetch messages for a specific chatroom"""
-#         room = self.get_object()
-#         messages = (
-#             room.messages.all()
-#         )  # Assuming a related_name='messages' in Message model
-#         return Response(
-#             MessageSerializer(messages, many=True).data, status=status.HTTP_200_OK
-#         )
+    @action(detail=True, methods=["get"])
+    def messages(self, request, pk=None):
+        """Fetch messages for a specific chatroom"""
+        room = self.get_object()
+        messages = (
+            room.messages.all()
+        )  # Assuming a related_name='messages' in Message model
+        return Response(
+            MessageSerializer(messages, many=True).data, status=status.HTTP_200_OK
+        )

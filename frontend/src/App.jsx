@@ -15,7 +15,7 @@ import CreateProfile from './pages/CreateProfile';
 // import UsersList from './pages/UsersList';
 import UserProfile from './pages/userProfile';
 
-// import { AuthProvider } from './AuthContext';
+import { AuthProvider } from './AuthContext';
 import Activities from './components/Activities';
 // import ActivitiesPage from './pages/ActivitiesPage';
 // import MyTeams from './pages/MyTeams';
@@ -27,7 +27,7 @@ import Activities from './components/Activities';
 const App = () => {
   return (
 
-    // <AuthProvider>
+    <AuthProvider>
 
       <Router>
         <div className='w-full overflow-hidden'>
@@ -63,7 +63,7 @@ const App = () => {
         </div>
       </Router>
 
-    // </AuthProvider>
+    </AuthProvider>
   )
 }
 
