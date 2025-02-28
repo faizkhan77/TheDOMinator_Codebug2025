@@ -13,7 +13,7 @@ import Signin from './pages/Signin';
 import CreateProfile from './pages/CreateProfile';
 // import EditProfile from './pages/EditProfile';
 // import UsersList from './pages/UsersList';
-// import UserProfile from './pages/userProfile';
+import UserProfile from './pages/userProfile';
 
 // import { AuthProvider } from './AuthContext';
 import Activities from './components/Activities';
@@ -46,9 +46,9 @@ const App = () => {
             {/* <Route path="/activities" element={<ActivitiesPage />} /> */}
             <Route path="/create-profile" element={<CreateProfile />} />
             {/* <Route path="/editprofile" element={<EditProfile />} /> */}
-            {/* <Route path="/user/:id" element={<UserProfile />} /> */}
+            <Route path="/user/:id" element={<UserProfile />} />
             <Route path="/about" element={<About />} />
-            <Route path='/teams' element={<Teams />} />
+            {/* <Route path='/teams' element={<Teams />} /> */}
             {/* <Route path='/team/:id' element={<Team />} />
             <Route path="/team/new" element={<TeamEdit />} /> 
             <Route path="/team/edit/:id" element={<TeamEdit />} />  

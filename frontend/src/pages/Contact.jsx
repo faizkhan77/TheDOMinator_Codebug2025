@@ -3,7 +3,7 @@ import { Navbar } from '../components';
 import styles from '../style';
 import emailjs from '@emailjs/browser'
 
-export const Contact = () => {
+const Contact = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -129,3 +129,5 @@ export const Contact = () => {
     </>
   );
 };
+
+export default Contact
