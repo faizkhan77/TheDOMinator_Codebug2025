@@ -9,25 +9,29 @@ const TeamList = ({ onSelectTeam, searchQuery, setSearchQuery }) => {
     useEffect(() => {
         getTeams();
     }, []);
-
     const getTeams = async () => {
-        const token = localStorage.getItem("access");
-
-        try {
-            const response = await axios.get("/api/teams/", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
-            });
-            console.log(response.data);
-            setTeams(response.data);
-        } catch (error) {
-            console.error("Failed to fetch teams:", error);
-        } finally {
-            setIsLoading(false); // Stop loading once the request is complete
-        }
-    };
+      const token = localStorage.getItem("access");
+  
+      try {
+          const response = await axios.get("/api/teams/", {
+              headers: {
+                  Authorization: `Bearer ${token}`,
+                  "Content-Type": "application/json",
+              },
+          });
+  
+          console.log(response.data);
+          setTeams(response.data);
+  
+          // Save teams in localStorage
+          localStorage.setItem("teams", JSON.stringify(response.data));
+      } catch (error) {
+          console.error("Failed to fetch teams:", error);
+      } finally {
+          setIsLoading(false); // Stop loading once the request is complete
+      }
+  };
+  
 
     const filteredTeams = teams.filter((team) =>
         team.name.toLowerCase().includes(searchQuery.toLowerCase()) ||

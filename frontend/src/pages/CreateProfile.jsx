@@ -147,162 +147,92 @@ const CreateProfile = () => {
 
 
     return (
-        <>
-
-
-            <div className="min-h-screen mt-4  text-gray-50 flex justify-center items-center bg-primary">
-                <div className="w-full max-w-4xl p-6 bg-gray-800 rounded-2xl shadow-xl">
-                    <h1 className="text-3xl font-bold text-center text-purple-500 mb-8">
-                        Create Your Profile
-                    </h1>
-                    {error && <p className="error-message">{error}</p>}
-                    <form onSubmit={handleSubmit}>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            {/* Personal Details Section */}
-                            <div>
-                                <h2 className="text-2xl font-semibold mb-4">Personal Details</h2>
-                                <div className="space-y-4">
-                                    {/* Name */}
-                                    <div className="flex items-center gap-4">
-                                        <label className="w-32">Name</label>
+        <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] text-white p-6">
+        <div className="w-full max-w-6xl bg-[#141414] rounded-2xl shadow-xl p-8 flex flex-col md:flex-row items-center gap-8">
+            {/* Left Section - Form */}
+            <div className="w-full md:w-2/3">
+                <h1 className="text-3xl font-bold text-center text-white mb-8">Create Your Profile</h1>
+                {error && <p className="text-red-500 text-center">{error}</p>}
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Personal Details */}
+                        <div>
+                            <h2 className="text-xl font-semibold mb-4">Personal Details</h2>
+                            <div className="space-y-4">
+                                {['full_name', 'role', 'location', 'experience'].map((field, index) => (
+                                    <div key={index} className="flex flex-col">
+                                        <label className="text-gray-400 capitalize">{field.replace('_', ' ')}</label>
                                         <input
                                             type="text"
-                                            name="full_name"
-                                            placeholder="Enter your name"
-                                            className="w-full bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300"
-                                            value={profileData.full_name} onChange={handleChange} required
+                                            name={field}
+                                            placeholder={`Enter your ${field.replace('_', ' ')}`}
+                                            className="w-full bg-[#0a0a0a] p-3 rounded border border-gray-700 focus:outline-none focus:ring-2 focus:ring-white transition"
+                                            value={profileData[field]}
+                                            onChange={handleChange}
+                                            required
                                         />
                                     </div>
-
-                                    {/* Role */}
-                                    <div className="flex items-center gap-4">
-                                        <label className="w-32">Role</label>
-                                        <input
-                                            type="text"
-                                            placeholder="Your current role (e.g., Developer)"
-                                            className="w-full bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300"
-                                            name="role" value={profileData.role} onChange={handleChange} required
-                                        />
-                                    </div>
-
-                                    <div className="flex items-center gap-4">
-                                        <label className="w-32">Location</label>
-                                        <input
-                                            type="text"  // We will keep this as text to manually control the input
-                                            placeholder="Where are you located?"
-                                            name="location" value={profileData.location} onChange={handleChange}
-                                            className="w-full bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300"
-                                        />
-                                    </div>
-
-                                    {/* Experience */}
-                                    <div className="flex items-center gap-4">
-                                        <label className="w-32">Experience</label>
-                                        <input
-                                            type="text"  // We will keep this as text to manually control the input
-                                            placeholder="Years of experience"
-                                            name="experience" value={profileData.experience} onChange={handleChange}
-                                            className="w-full bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300"
-                                        />
-                                    </div>
-
-                                </div>
+                                ))}
                             </div>
-
-                            {/* Social Links Section */}
-                            <div>
-                                <h2 className="text-2xl font-semibold mb-4">Social Links</h2>
-                                <div className="space-y-4">
-                                    <div className="flex items-center gap-4">
-                                        <FaGithub className="text-purple-500 text-2xl" />
-                                        <input
-                                            type="text"
-                                            placeholder="GitHub Profile URL"
-                                            className="w-full bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300"
-                                            name="github" value={profileData.github} onChange={handleChange}
-                                        />
-                                        {linkerrors.github && <p className="text-red-500 text-sm">{linkerrors.github}</p>}
-                                    </div>
-
-                                    <div className="flex items-center gap-4">
-                                        <FaLinkedin className="text-blue-500 text-2xl" />
-                                        <input
-                                            type="text"
-                                            placeholder="LinkedIn Profile URL"
-                                            className="w-full bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
-                                            name="linkedin" value={profileData.linkedin} onChange={handleChange}
-                                        />
-                                        {linkerrors.github && <p className="text-red-500 text-sm">{linkerrors.github}</p>}
-                                    </div>
-
-                                    <div className="flex items-center gap-4">
-                                        <FaInstagram className="text-pink-500 text-2xl" />
-                                        <input
-                                            type="text"
-                                            placeholder="Instagram Profile URL"
-                                            className="w-full bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-300"
-                                            name="instagram" value={profileData.instagram} onChange={handleChange}
-                                        />
-                                        {linkerrors.github && <p className="text-red-500 text-sm">{linkerrors.github}</p>}
-                                    </div>
-
-                                    <div className="flex items-center gap-4">
-                                        <FaEnvelope className="text-red-500 text-2xl" />
-                                        <input
-                                            type="email"
-                                            placeholder="Email Address"
-                                            className="w-full bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-300"
-                                        />
-                                    </div>
-
-                                    <div className="flex items-center gap-4">
-                                        <FaLink className="text-green-500 text-2xl" />
-                                        <input
-                                            type="text"
-                                            placeholder="Portfolio URL"
-                                            className="w-full bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-300"
-                                            name="portfolio" value={profileData.portfolio} onChange={handleChange}
-                                        />
-                                        {linkerrors.github && <p className="text-red-500 text-sm">{linkerrors.github}</p>}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="col-span-2">
-                                <h2 className="text-2xl font-semibold mb-4">Bio</h2>
-                                <textarea
-                                    placeholder="Write something about yourself..."
-                                    className="w-full bg-gray-700 p-4 rounded h-40 focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300"
-                                    name="bio" value={profileData.bio} onChange={handleChange} required
-                                />
-                            </div>
-
-                            {/* Skills Section */}
-                            <div className="col-span-2">
-                                <h2 className="text-2xl font-semibold mb-4">Skills</h2>
-                                <textarea
-                                    placeholder="List your skills (e.g., JavaScript, React, Node.js)"
-                                    className="w-full bg-gray-700 p-4 rounded h-40 focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300"
-                                    name="skills" value={profileData.skills} onChange={handleChange} required
-                                />
-                            </div>
-
                         </div>
-
-                        {/* Submit Button */}
-                        <div className="mt-8 text-center">
-                            <button type="submit" className=" bg-purple-500  hover:bg-purple-600 text-white px-6 py-2 rounded-full shadow-lg transition duration-300">
-                                {btnloading ? (
-                                    <div className="animate-spin w-6 h-6 border-4 border-t-transparent border-white rounded-full"></div>
-                                ) : (
-                                    "Save Profile"
-                                )}
-                            </button>
+                        {/* Social Links */}
+                        <div>
+                            <h2 className="text-xl font-semibold mb-4">Social Links</h2>
+                            <div className="space-y-4">
+                                {[
+                                    { name: 'github', icon: <FaGithub className="text-white text-2xl" /> },
+                                    { name: 'linkedin', icon: <FaLinkedin className="text-blue-500 text-2xl" /> },
+                                    { name: 'instagram', icon: <FaInstagram className="text-pink-500 text-2xl" /> },
+                                    { name: 'email', icon: <FaEnvelope className="text-red-500 text-2xl" />, type: 'email' },
+                                    { name: 'portfolio', icon: <FaLink className="text-green-500 text-2xl" /> }
+                                ].map(({ name, icon, type = 'text' }, index) => (
+                                    <div key={index} className="flex items-center gap-4">
+                                        {icon}
+                                        <input
+                                            type={type}
+                                            name={name}
+                                            placeholder={`${name.charAt(0).toUpperCase() + name.slice(1)} URL`}
+                                            className="w-full bg-[#0a0a0a] p-3 rounded border border-gray-700 focus:outline-none focus:ring-2 focus:ring-white transition"
+                                            value={profileData[name] || ''}
+                                            onChange={handleChange}
+                                        />
+                                        {linkerrors[name] && <p className="text-red-500 text-sm">{linkerrors[name]}</p>}
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                    {/* Bio and Skills */}
+                    {['bio', 'skills'].map((field, index) => (
+                        <div key={index}>
+                            <h2 className="text-xl font-semibold mb-4">{field.charAt(0).toUpperCase() + field.slice(1)}</h2>
+                            <textarea
+                                name={field}
+                                placeholder={`Write about your ${field}...`}
+                                className="w-full bg-[#0a0a0a] p-3 rounded border border-gray-700 h-32 focus:outline-none focus:ring-2 focus:ring-white transition"
+                                value={profileData[field]}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+                    ))}
+                    {/* Submit Button */}
+                    <div className="text-center">
+                        <button type="submit" className="bg-white text-black px-6 py-3 rounded-full shadow-lg hover:bg-gray-300 transition">
+                            {btnloading ? <div className="animate-spin w-6 h-6 border-4 border-t-transparent border-black rounded-full"></div> : "Save Profile"}
+                        </button>
+                    </div>
+                </form>
             </div>
-        </>
+            {/* Right Section - Image */}
+<div className="hidden md:flex w-1/3 self-stretch rounded-lg">
+    <img src="https://i.pinimg.com/736x/3a/83/d1/3a83d14ebf6939dbdc1f155087c7be71.jpg" 
+        alt="Profile Illustration" 
+        className="w-full h-full rounded-lg shadow-lg object-cover" />
+</div>
+
+        </div>
+    </div>
     );
 };
 

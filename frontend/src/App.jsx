@@ -5,7 +5,7 @@ import Home from './Home';
 import About from './pages/About';
 import LoggedinHome from './pages/LoggedinHome';
 import Login from "./pages/Login"
-// import Teams from './pages/Teams';
+import Teams from './pages/Teams';
 // import Team from './pages/Team';
 // import TeamEdit from './pages/TeamEdit';
 // import Chat from './pages/Chat';
@@ -48,7 +48,7 @@ const App = () => {
             {/* <Route path="/editprofile" element={<EditProfile />} /> */}
             <Route path="/user/:id" element={<UserProfile />} />
             <Route path="/about" element={<About />} />
-            {/* <Route path='/teams' element={<Teams />} /> */}
+            <Route path='/teams' element={<Teams />} />
             {/* <Route path='/team/:id' element={<Team />} />
             <Route path="/team/new" element={<TeamEdit />} /> 
             <Route path="/team/edit/:id" element={<TeamEdit />} />  
