@@ -93,7 +93,7 @@ const Sidebar = ({ toggleSidebar }) => {
                             <img
                                 src={profile?.avatar}
                                 alt="Avatar"
-                                className="w-12 h-12 rounded-full  border-2 border-gray-300 bg-cover "
+                                className="w-12 h-12 rounded-full border-2 border-gray-300"
                             />
                         </div>
                         <div id="nav-footer-titlebox">
