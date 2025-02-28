@@ -15,6 +15,7 @@ from .views import (
     JoinRequestViewSet,
     recommend_teams,
     recommend_users,
+    UserProjectViewSet
 )
 
 
@@ -28,6 +29,8 @@ router.register(r"messages", MessageViewSet, basename="message")
 router.register(r"invitations", InvitationViewSet, basename="invitation")
 router.register(r"join-requests", JoinRequestViewSet, basename="join-request")
 router.register(r"skills", UserSkillViewSet, basename="skill")
+router.register(r"projects", UserProjectViewSet, basename="project")
+
 
 from rest_framework_simplejwt.views import TokenRefreshView
 

@@ -8,6 +8,7 @@ import { FaGithub, FaFacebook, FaInstagram, FaLinkedin, FaGlobe } from "react-ic
 import LoggedinNav from "../components/LoggedinNav";
 import SkillAssessmentModal from "../components/SkillAssessmentModal";
 import "./Scrollbar.css"
+import Card from "../components/Card";
 
 const UserProfile = () => {
     const [user, setUser] = useState(null)
@@ -77,6 +78,8 @@ const UserProfile = () => {
         setSelectedSkill(null);
         navigate(`/assessment/${skill.skill_name}`, { state: { skillId: skill.id } }); // Redirect to assessment page
     };
+
+    console.log(profile?.projects[0].title);
 
     return (
         <>
@@ -254,6 +257,25 @@ const UserProfile = () => {
                   <p className="text-gray-400 whitespace-pre-line">{profile?.experience || "No experience details provided"}</p>
                 </div>
               </div>
+
+            {/* Projects Showcase - New Section */}
+            <div className="bg-[#141414] rounded-2xl shadow-lg p-6 w-full md:col-span-2 relative">
+              <div className="flex justify-between items-center mb-4">
+                <h6 className="text-white text-lg font-semibold">Projects Showcase</h6>
+                <button className="bg-[#1f1f1f] text-white px-4 py-2 rounded-lg shadow-md hover:bg-[#292929] transition flex items-center gap-2">
+                  <span className="text-sm font-medium">Add Project</span>
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"></path>
+                  </svg>
+                </button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {profile?.projects.map((project) => (
+                  <Card key={project.id} project={project} />
+                ))}
+              </div>
+            </div>
+
             </>
           )}
         </div>

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import UserProfile, Team, Room, Message, Invitation, UserSkill, JoinRequest
+from .models import UserProfile, Team, Room, Message, Invitation, UserSkill, JoinRequest, UserProject
 
 
 class UserSkillSerializer(serializers.ModelSerializer):
@@ -29,6 +29,27 @@ class UserSkillSerializer(serializers.ModelSerializer):
         return instance
 
 
+class UserProjectSerializer(serializers.ModelSerializer):
+    """Serializer for UserProject model"""
+    
+    # profile = UserProfileSerializer()  # Nesting UserProfile data
+
+    class Meta:
+        model = UserProject
+        fields = [
+            "id",
+            "user_profile",
+            "title",
+            "summary",
+            "cover_image",
+            "github_link",
+            "live_demo",
+            "created",
+            "updated",
+            # "profile"
+        ]
+        read_only_fields = ["id", "created", "updated"]  # Prevent modification of these fields
+
 class UserProfileSerializer(serializers.ModelSerializer):
     """Serializer for UserProfile model"""
 
@@ -38,6 +59,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     # Skills should be writable now
     skills = UserSkillSerializer(many=True, required=False)
+    
+    projects = UserProjectSerializer(many=True, required=False)
 
     class Meta:
         model = UserProfile
@@ -59,6 +82,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "email",
             "bio",
             "location",
+            "projects"
         ]
         read_only_fields = ["created", "updated"]
 
@@ -91,6 +115,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id", "username", "email", "profile"]
+        
 
 
 class TeamSerializer(serializers.ModelSerializer):

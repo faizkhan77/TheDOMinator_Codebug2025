@@ -15,7 +15,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
-from .models import UserProfile, Team, Room, Message, Invitation, UserSkill, JoinRequest
+from .models import UserProfile, Team, Room, Message, Invitation, UserSkill, JoinRequest, UserProject
 from .serializers import (
     UserSerializer,
     UserProfileSerializer,
@@ -25,6 +25,7 @@ from .serializers import (
     InvitationSerializer,
     UserSkillSerializer,
     JoinRequestSerializer,
+    UserProjectSerializer
 )
 
 # Create your views here.
@@ -223,6 +224,19 @@ class UserSkillViewSet(viewsets.ViewSet):
                 {"error": "Skill not found"}, status=status.HTTP_404_NOT_FOUND
             )
 
+class UserProjectViewSet(viewsets.ModelViewSet):
+    """ViewSet for managing User Projects"""
+
+    serializer_class = UserProjectSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        """Filter projects by user profile"""
+        return UserProject.objects.all()
+
+    def perform_create(self, serializer):
+        """Set the user profile when a project is created"""
+        serializer.save(user_profile=self.request.user.profile)
 
 # ✅ Team ViewSet
 class TeamViewSet(viewsets.ModelViewSet):

@@ -53,6 +53,28 @@ class UserSkill(models.Model):
         return f"{self.user_profile.full_name} - {self.skill_name} ({'Verified' if self.verified else 'Not Verified'})"
 
 
+class UserProject(models.Model):
+    """Model for users to showcase their projects"""
+
+    user_profile = models.ForeignKey(
+        UserProfile, on_delete=models.CASCADE, related_name="projects"
+    )
+    title = models.CharField(max_length=200, help_text="Project name")
+    summary = models.TextField(help_text="Brief description of the project")
+    cover_image = models.ImageField(
+        upload_to="project_covers/", blank=True, null=True
+    )  # Cover photo
+    github_link = models.URLField(blank=True, help_text="GitHub repository URL")
+    live_demo = models.URLField(
+        blank=True, null=True, help_text="Live website URL (if available)"
+    )
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user_profile.full_name} - {self.title}"
+
+
 
 class Team(models.Model):
     TEAM_TYPES = [
