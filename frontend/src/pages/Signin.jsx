@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import { useAuth } from "../AuthContext";
+import { useAuth } from "../AuthContext";
 import { Navbar } from "../components";
 import styles from '../style';
 import "./Spinner.css"
 
 const Signin = () => {
-    // const { signup } = useAuth();
+    const { signup } = useAuth();
     const [loading, setLoading] = useState(false); // Added loading state
     const navigate = useNavigate();
 
@@ -28,11 +28,11 @@ const Signin = () => {
         setError("");
 
         try {
-            // await signup(
-            //     formData.username,
-            //     formData.password,
-            //     formData.confirmPassword
-            // );
+            await signup(
+                formData.username,
+                formData.password,
+                formData.confirmPassword
+            );
 
             navigate("/create-profile"); // Proceed to profile creation
         } catch (err) {
@@ -44,16 +44,17 @@ const Signin = () => {
 
 
     return (
-      <>
+        <>
             <div className={`${styles.paddingX} ${styles.flexCenter} bg-primary`}>
                 <div className={`${styles.boxWidth}`}>
                     <Navbar />
                 </div>
             </div>
 
-            <div className="bg-[#0a0a0a] text-white font-sans min-h-screen flex items-center justify-center">
-                <div className="bg-[#141414] w-full max-w-md p-8 rounded-xl shadow-lg">
-                    <h1 className="text-3xl font-bold text-center mb-6 text-white">Create Account</h1>
+
+            <div className="bg-[#00040f] text-white font-sans min-h-screen flex items-center justify-center">
+                <div className="bg-gray-800 bg-opacity-90 w-full max-w-md p-8 rounded-xl shadow-2xl">
+                    <h1 className="text-3xl font-bold text-center mb-6 text-purple-300">Create Account</h1>
                     <form className="space-y-6" onSubmit={handleSubmit}>
                         <div>
                             <label htmlFor="username" className="block text-sm font-medium mb-2">
@@ -65,9 +66,8 @@ const Signin = () => {
                                 id="username"
                                 value={formData.username}
                                 onChange={handleChange}
-                                className="w-full bg-[#1f1e24] border border-gray-700 rounded-md px-4 py-3 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none placeholder-gray-400"
+                                className="w-full bg-gray-700 border border-transparent rounded-md px-4 py-3 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none placeholder-gray-400"
                                 placeholder="Enter your username"
-                                required
                             />
                         </div>
                         <div>
@@ -78,11 +78,9 @@ const Signin = () => {
                                 type="password"
                                 name="password"
                                 id="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                className="w-full bg-[#1f1e24] border border-gray-700 rounded-md px-4 py-3 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none placeholder-gray-400"
+                                value={formData.password} onChange={handleChange} required
+                                className="w-full bg-gray-700 border border-transparent rounded-md px-4 py-3 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none placeholder-gray-400"
                                 placeholder="Enter your password"
-                                required
                             />
                         </div>
                         <div>
@@ -93,16 +91,14 @@ const Signin = () => {
                                 type="password"
                                 id="confirmPassword"
                                 name="confirmPassword"
-                                value={formData.confirmPassword}
-                                onChange={handleChange}
-                                className="w-full bg-[#1f1e24] border border-gray-700 rounded-md px-4 py-3 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none placeholder-gray-400"
+                                value={formData.confirmPassword} onChange={handleChange} required
+                                className="w-full bg-gray-700 border border-transparent rounded-md px-4 py-3 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none placeholder-gray-400"
                                 placeholder="Confirm your password"
-                                required
                             />
                         </div>
                         <button
                             type="submit"
-                            className="w-full bg-white text-black py-3 rounded-md hover:bg-gray-400 focus:outline-none transition duration-300 flex justify-center items-center"
+                            className="w-full bg-purple-500 text-white py-3 rounded-md hover:bg-purple-400 focus:outline-none transition duration-300 flex justify-center items-center"
                             disabled={loading}
                         >
                             {loading ? <span className="spinner"></span> : "Sign Up"}
@@ -118,6 +114,8 @@ const Signin = () => {
                     </div>
                 </div>
             </div>
+
+
         </>
     );
 };

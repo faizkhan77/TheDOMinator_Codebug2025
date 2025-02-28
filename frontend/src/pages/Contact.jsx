@@ -1,9 +1,9 @@
-
 import React, { useState } from 'react';
 import { Navbar } from '../components';
 import styles from '../style';
+import emailjs from '@emailjs/browser'
 
- const Contact = () => {
+export const Contact = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -22,6 +22,19 @@ import styles from '../style';
   const handleSubmit = (e) => {
     e.preventDefault();
     // Handle form submission logic (e.g., sending to an API or server)
+    emailjs
+      .sendForm('service_rvbknul', 'template_qikbkai', e.target, {
+        publicKey: 'k9Pt_WGKzhQd7nteq',
+      })
+      .then(
+        () => {
+          console.log('SUCCESS!');
+        },
+        (error) => {
+          console.log('FAILED...', error.text);
+        },
+      );
+
     alert('Message sent!');
   };
 
@@ -35,7 +48,7 @@ import styles from '../style';
       <div className="min-h-screen bg-[#00040f] text-white flex flex-col items-center justify-center py-16 px-6">
         <div className="w-full max-w-md p-8 bg-[#00040f] rounded-lg shadow-2xl space-y-6">
           {/* Header */}
-          <h1 className="text-3xl font-bold text-center text-white">
+          <h1 className="text-3xl font-bold text-center text-[#6556cd]">
             Contact Us
           </h1>
           <p className="text-center text-gray-400 text-lg mb-6">
@@ -95,7 +108,7 @@ import styles from '../style';
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full py-3 bg-white text-black rounded-md hover:bg-gray-400 focus:outline-none transition duration-300 font-semibold"
+              className="w-full py-3 bg-[#6556cd] text-black rounded-md hover:bg-[#4b49b4] focus:outline-none transition duration-300 font-semibold"
             >
               Send Message
             </button>
@@ -103,12 +116,12 @@ import styles from '../style';
 
           {/* Contact Info */}
           <div className="text-center mt-8 space-y-4">
-            <h2 className="text-xl font-bold text-[#dadada]">Contact Information</h2>
+            <h2 className="text-xl font-bold text-[#6556cd]">Contact Information</h2>
             <p className="text-gray-400 text-lg">
-              Email: <span className="text-white">support@yourwebsite.com</span>
+              Email: <span className="text-white">faizkhan.net7@gmail.com</span>
             </p>
             <p className="text-gray-400 text-lg">
-              Phone: <span className="text-white">+91 8424961215</span>
+              Phone: <span className="text-white">+91 7506984906</span>
             </p>
           </div>
         </div>
@@ -116,5 +129,3 @@ import styles from '../style';
     </>
   );
 };
-
-export default Contact;

@@ -6,11 +6,12 @@ import { moin1, moin2, faiz1, faiz2 } from "../assets";
 const About = () => {
   return (
     <>
-      <div className={`${styles.paddingX} ${styles.flexCenter} bg-primary`}>
+      <div className={`${styles.paddingX} ${styles.flexCenter} bg-primary relative z-50`}>
         <div className={`${styles.boxWidth}`}>
           <Navbar />
         </div>
       </div>
+
 
       <section className="py-24 relative bg-primary">
         <div className="w-full max-w-7xl px-4 md:px-5 lg:px-5 mx-auto">
@@ -113,7 +114,7 @@ const About = () => {
                 I am Moin Nakhwaji, a Full Stack Developer with 2 years of experience, primarily working with the MERN Stack. I have also developed a strong proficiency in web design, specifically using TailwindCSS. Over the years, I have worked on various development projects, honing my skills and delivering impactful solutions. My passion for coding and building scalable, efficient applications drives me to continuously learn and grow.
               </p>
               <div className="mt-6 flex space-x-4">
-                <a href="https://www.instagram.com/moinnakhwaji" target="_blank" className="text-gray-300 hover:text-blue-500 transition duration-300">
+                <a href="https://www.instagram.com/moin.nakhwaji" target="_blank" className="text-gray-300 hover:text-blue-500 transition duration-300">
                   <i className="fab fa-instagram text-2xl"></i>
                 </a>
                 <a href="https://github.com/MoinNakhwaji" target="_blank" className="text-gray-300 hover:text-blue-500 transition duration-300">
@@ -177,7 +178,7 @@ const About = () => {
               <button className="sm:w-fit w-full group px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 rounded-lg shadow-[0px_1px_2px_0px_rgba(16,_24,_40,_0.05)] transition-all duration-700 ease-in-out justify-center items-center flex">
                 <span className="px-1.5 text-indigo-600 text-sm font-medium leading-6 group-hover:-translate-x-0.5 transition-all duration-700 ease-in-out">Read More</span>
                 <svg className="group-hover:translate-x-0.5 transition-all duration-700 ease-in-out" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
-                  <path d="M6.75265 4.49658L11.2528 8.99677L6.75 13.4996" stroke="#4F46E5" strokeWidth="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M6.75265 4.49658L11.2528 8.99677L6.75 13.4996" stroke="#4F46E5" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </button>
             </div>
@@ -193,7 +194,12 @@ const About = () => {
       </section>
 
 
-      <Footer />
+      <div className={`bg-primary ${styles.paddingX} ${styles.flexCenter}`}>
+        <div className={`${styles.boxWidth}`}>
+          <Footer />
+        </div>
+      </div>
+
 
 
     </>
