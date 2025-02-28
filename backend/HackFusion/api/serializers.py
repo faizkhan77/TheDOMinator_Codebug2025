@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import UserProfile, Team, Room, Message,  UserSkill, Invitation, JoinRequest
+from .models import UserProfile, Team, Room, Message, Invitation, UserSkill, JoinRequest
 
 
 class UserSkillSerializer(serializers.ModelSerializer):

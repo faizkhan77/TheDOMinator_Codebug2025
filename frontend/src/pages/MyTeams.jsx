@@ -26,6 +26,9 @@ const MyTeams = () => {
         const userProfile = JSON.parse(localStorage.getItem("userProfile")); // ✅ Get userProfile
         const userTeamIds = userProfile?.teams || []; // ✅ Extract team IDs array
 
+
+        console.warn("team Id", userTeamIds)
+
         try {
             const response = await axios.get("/api/teams/", {
                 headers: {
@@ -38,9 +41,13 @@ const MyTeams = () => {
             const myTeams = response.data.filter((team) => userTeamIds.includes(team.id));
             setTeams(myTeams);
             localStorage.setItem("myTeams", JSON.stringify(myTeams)); // ✅ Store in localStorage
+
+            console.log("MY TEANS", response.data.team)
         } catch (error) {
             console.error("Failed to fetch teams:", error);
         }
+
+        
     };
 
     // ✅ Filter teams based on name or "looking_for" field

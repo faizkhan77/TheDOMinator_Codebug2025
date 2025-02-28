@@ -239,26 +239,42 @@ class TeamViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def join(self, request, pk=None):
-        """Allow a user to join a team if there's space."""
+        """Allow a user to join a public team if there's space."""
         team = self.get_object()
         user = request.user
 
+        # Check if the team is public
+        if team.team_type != "PUBLIC":
+            return Response(
+                {"detail": "You can only join public teams directly."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
         # Check if user is already a member
-        if user in team.members.all():
+        if team.members.filter(id=user.id).exists():
             return Response(
                 {"detail": "You are already a member."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Check if team is full
+        # Check if team has reached its member limit
         if team.members.count() >= team.members_limit:
             return Response(
                 {"detail": "Team is full."}, status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Add user to the team
+        # ✅ Add user to the team's members
         team.members.add(user)
-        return Response({"detail": "Joined successfully!"}, status=status.HTTP_200_OK)
+
+        # ✅ Update the user's profile to include this team
+        user_profile, created = UserProfile.objects.get_or_create(user=user)
+        user_profile.teams.add(team)  # Add the team to the user's profile
+        user_profile.save()
+
+        return Response(
+            {"detail": "You have successfully joined the team!"},
+            status=status.HTTP_200_OK,
+        )
 
     @action(detail=True, methods=["post"])
     def leave(self, request, pk=None):

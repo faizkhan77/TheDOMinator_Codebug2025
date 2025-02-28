@@ -8,7 +8,7 @@ import Login from "./pages/Login"
 import Teams from './pages/Teams';
 import Team from './pages/Team';
 import TeamEdit from './pages/TeamEdit';
-// import Chat from './pages/Chat';
+import Chat from './pages/Chat';
 import Signin from './pages/Signin';
 import CreateProfile from './pages/CreateProfile';
 import EditProfile from './pages/EditProfile';
@@ -53,7 +53,7 @@ const App = () => {
             <Route path="/team/new" element={<TeamEdit />} /> 
             <Route path="/team/edit/:id" element={<TeamEdit />} />  
             <Route path='/myteams' element={<MyTeams />} />
-            {/* <Route path="/chat/:chatroomId" element={<Chat />} /> */}
+            <Route path="/chat/:chatroomId" element={<Chat />} />
             <Route path='/invitations' element={<Invitations />} />
             {/* <Route path="/recommended-content" element={<RecommendedContent />} />
             <Route path="/assessment/:skill" element={<SkillAssessmentPage />} /> */}

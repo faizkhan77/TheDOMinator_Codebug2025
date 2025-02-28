@@ -74,47 +74,31 @@ const Team = () => {
 
     const joinPublicTeam = async () => {
         const token = localStorage.getItem("access");
+        const userId = JSON.parse(localStorage.getItem("user"))?.id; // ✅ Get user ID from local storage
+    
+        if (!token || !userId) {
+            alert("User not authenticated. Please log in again.");
+            return;
+        }
     
         try {
-            // Send request to join the public team
+            // ✅ Send request to join the public team
             await axios.post(
                 `/api/teams/${team.id}/join/`, 
                 {}, 
                 { headers: { Authorization: `Bearer ${token}` } }
             );
     
-            // ✅ Fetch and update myTeams after joining
+            // ✅ Fetch updated user profile (includes new team in "teams[]")
+            await fetchUserProfile(token, userId);
+    
+            // ✅ Fetch and update teams after joining
             await fetchAndUpdateMyTeams();
     
             alert("You have successfully joined the team!");
         } catch (error) {
             console.error("Failed to join public team:", error.response?.data || error.message);
             alert(error.response?.data?.detail || "Failed to join the team. Please try again.");
-        }
-    };
-
-    const fetchAndUpdateMyTeams = async () => {
-        const token = localStorage.getItem("access");
-        const userProfile = JSON.parse(localStorage.getItem("userProfile")); // ✅ Get user profile
-        const userTeamIds = userProfile?.teams || []; // ✅ Extract team IDs
-    
-        try {
-            const response = await axios.get("/api/teams/", {
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
-            });
-    
-            // ✅ Store all teams in localStorage
-            localStorage.setItem("teams", JSON.stringify(response.data));
-    
-            // ✅ Filter out the teams the user is part of
-            const myTeams = response.data.filter(team => userTeamIds.includes(team.id));
-            localStorage.setItem("myTeams", JSON.stringify(myTeams)); // ✅ Store filtered teams
-    
-        } catch (error) {
-            console.error("Failed to fetch teams:", error);
         }
     };
     
