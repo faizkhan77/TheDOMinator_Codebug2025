@@ -1,0 +1,30 @@
+# General ignores
+.DS_Store
+.idea/
+.vscode/
+*.log
+
+# React (frontend) ignores
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+
+# Django (thedominator) ignores
+backend/HackFusion/__pycache__/
+backend/HackFusion/*.py[cod]
+backend/HackFusion/$py.class
+# thedominator/db.sqlite3
+backend/HackFusion/*.log
+# backend/HackFusion/static/
+# backend/HackFusion/media/
+backend/HackFusion/.env
+backend/HackFusion/env/
+backend/HackFusion/.venv/
+backend/HackFusion/venv/
+
+# Python virtual environment
+env/
+
+# Miscellaneous
+*.swp
+
