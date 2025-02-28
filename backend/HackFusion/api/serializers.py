@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import UserProfile, Team, Room, Message,  UserSkill
+from .models import UserProfile, Team, Room, Message,  UserSkill, Invitation, JoinRequest
 
 
 class UserSkillSerializer(serializers.ModelSerializer):
@@ -121,23 +121,23 @@ class TeamSerializer(serializers.ModelSerializer):
         read_only_fields = ["created", "updated"]
 
 
-# class InvitationSerializer(serializers.ModelSerializer):
-#     sender = UserSerializer(read_only=True)
-#     recipient = UserSerializer(read_only=True)
-#     team = TeamSerializer(read_only=True)
+class InvitationSerializer(serializers.ModelSerializer):
+    sender = UserSerializer(read_only=True)
+    recipient = UserSerializer(read_only=True)
+    team = TeamSerializer(read_only=True)
 
-#     class Meta:
-#         model = Invitation
-#         fields = ["id", "sender", "recipient", "team", "status", "created_at"]
+    class Meta:
+        model = Invitation
+        fields = ["id", "sender", "recipient", "team", "status", "created_at"]
 
 
-# class JoinRequestSerializer(serializers.ModelSerializer):
-#     user = UserSerializer(read_only=True)
-#     team = TeamSerializer(read_only=True)
+class JoinRequestSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    team = TeamSerializer(read_only=True)
 
-#     class Meta:
-#         model = JoinRequest
-#         fields = "__all__"
+    class Meta:
+        model = JoinRequest
+        fields = "__all__"
 
 
 class RoomSerializer(serializers.ModelSerializer):
