@@ -5,7 +5,7 @@ import Activities from "../components/Activities";
 // import TeamList from "../components/TeamList";
 // import RolesandSkills from "../components/RolesandSkills";
 import Sidebar from "../components/Sidebar";
-// import LoggedinNav from "../components/LoggedinNav";
+import LoggedinNav from "../components/LoggedinNav";
 import axios from "axios";
 
 const LoggedinHome = () => {
@@ -94,14 +94,14 @@ const LoggedinHome = () => {
           {/* For small and medium screens, stack columns vertically. On large screens, show as a row with spacing */}
           <div className="flex flex-col lg:flex-row lg:space-x-8 space-y-6 lg:space-y-0">
             {/* Left Column - Roles and Skills */}
-            <div className="w-full lg:w-1/4">
+            {/* <div className="w-full lg:w-1/4">
               <RolesandSkills setSearchQuery={setSearchQuery} />
-            </div>
+            </div> */}
 
             {/* Middle Column - TeamList */}
-            <div className="w-full lg:w-1/2">
+            {/* <div className="w-full lg:w-1/2">
               <TeamList searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-            </div>
+            </div> */}
 
             {/* Right Column - Activities */}
             <div className="w-full lg:w-1/4">
