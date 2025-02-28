@@ -11,6 +11,9 @@ from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 from .models import UserProfile, Team, Room, Message, Invitation, UserSkill, JoinRequest
 from .serializers import (
@@ -541,3 +544,103 @@ def kick_member_from_team(request, team_id):
     return Response(
         {"detail": "Member kicked successfully."}, status=status.HTTP_200_OK
     )
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def recommend_teams(request):
+    """API endpoint to recommend teams based on user profile."""
+    user = request.user
+    if not user.is_authenticated:
+        return JsonResponse({"error": "User is not authenticated"}, status=401)
+
+    try:
+        user_profile = UserProfile.objects.get(user=user)
+    except UserProfile.DoesNotExist:
+        return JsonResponse({"error": "User profile not found"}, status=404)
+
+    # Fetch the user's skills correctly by joining them into a string
+    user_skills = " ".join(
+        [skill.skill_name.lower() for skill in user_profile.skills.all()]
+    )
+    user_role = (user_profile.role or "").lower()
+    user_data = user_skills + " " + user_role  # Combine role and skills
+
+    # Fetch all teams
+    teams = Team.objects.all()
+    if not teams.exists():
+        return JsonResponse({"error": "No teams found"}, status=404)
+
+    # Ensure `looking_for` and `description` are not None
+    team_data = [
+        (team.looking_for or "").lower() + " " + (team.description or "").lower()
+        for team in teams
+    ]
+
+    # Vectorizing the text data using TF-IDF
+    vectorizer = TfidfVectorizer()
+    vectors = vectorizer.fit_transform([user_data] + team_data)
+
+    # Compute cosine similarity between user profile and all teams
+    similarities = cosine_similarity(vectors[0], vectors[1:]).flatten()
+
+    # Sort teams based on similarity scores
+    team_scores = list(zip(teams, similarities))
+    team_scores.sort(key=lambda x: x[1], reverse=True)
+
+    # Serialize top 5 recommended teams
+    recommended_teams = TeamSerializer(
+        [team for team, score in team_scores[:5] if score > 0], many=True
+    ).data
+
+    return Response({"recommended_teams": recommended_teams})
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def recommend_users(request, team_id):
+    """API endpoint to recommend users based on a team's description and looking_for field."""
+    try:
+        team = Team.objects.get(id=team_id)
+    except Team.DoesNotExist:
+        return Response({"error": "Team not found"}, status=404)
+
+    # Ensure `looking_for` and `description` are not None
+    team_description = (team.description or "").lower()
+    team_looking_for = (team.looking_for or "").lower()
+    team_data = (
+        team_description + " " + team_looking_for
+    )  # Combine description and looking_for
+
+    # Fetch all user profiles
+    users = UserProfile.objects.all()
+    if not users.exists():
+        return Response({"error": "No users found"}, status=404)
+
+    # Ensure `role` and `skills` are not None for each user
+    user_data = [
+        (user.role or "").lower()
+        + " "
+        + " ".join([skill.skill_name.lower() for skill in user.skills.all()])
+        for user in users
+    ]
+
+    # Vectorizing the text data using TF-IDF
+    vectorizer = TfidfVectorizer()
+    vectors = vectorizer.fit_transform([team_data] + user_data)
+
+    # Compute cosine similarity between team and all users
+    similarities = cosine_similarity(vectors[0], vectors[1:]).flatten()
+
+    # Sort users based on similarity scores
+    user_scores = list(zip(users, similarities))
+    user_scores.sort(key=lambda x: x[1], reverse=True)
+
+    # Serialize top 5 recommended users
+    recommended_users = [
+        UserProfileSerializer(user).data
+        for user, score in user_scores[:5]
+        if score > 0  # Ensure only relevant users are shown
+    ]
+
+    return Response({"recommended_users": recommended_users})

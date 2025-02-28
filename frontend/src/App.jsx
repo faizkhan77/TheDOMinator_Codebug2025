@@ -21,8 +21,8 @@ import ActivitiesPage from './pages/ActivitiesPage';
 import MyTeams from './pages/MyTeams';
 import Invitations from './pages/Invitations';
 
-// import RecommendedContent from './pages/RecommendedContent';
-// import SkillAssessmentPage from './components/SkillAssessmentPage';
+import RecommendedContent from './pages/RecommendedContent';
+import SkillAssessmentPage from './components/SkillAssessmentPage';
 
 const App = () => {
   return (
@@ -55,8 +55,8 @@ const App = () => {
             <Route path='/myteams' element={<MyTeams />} />
             <Route path="/chat/:chatroomId" element={<Chat />} />
             <Route path='/invitations' element={<Invitations />} />
-            {/* <Route path="/recommended-content" element={<RecommendedContent />} />
-            <Route path="/assessment/:skill" element={<SkillAssessmentPage />} /> */}
+            <Route path="/recommended-content" element={<RecommendedContent />} />
+            <Route path="/assessment/:skill" element={<SkillAssessmentPage />} />
 
 
           </Routes>

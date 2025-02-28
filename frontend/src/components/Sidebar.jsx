@@ -87,28 +87,28 @@ const Sidebar = ({ toggleSidebar }) => {
 
             <input id="nav-footer-toggle" type="checkbox" />
             <div id="nav-footer">
-                <Link to={`/user/${user?.id}`}>
-                    <div id="nav-footer-heading">
-                        <div id="nav-footer-avatar">
-                            <img
-                                src={profile?.avatar}
-                                alt="Avatar"
-                                className="w-12 h-12 rounded-full border-2 border-gray-300"
-                            />
-                        </div>
-                        <div id="nav-footer-titlebox">
-                            <span id="nav-footer-title" rel="noopener noreferrer" style={{ fontSize: "15px" }}>
-                                {profile ? profile.full_name.slice(0, 10) : "Guest"}
-                            </span>
-                            <span id="nav-footer-subtitle"></span>
-                        </div>
-                        <label htmlFor="nav-footer-toggle">
-                            <i className="fas fa-caret-up"></i>
-                        </label>
-                    </div>
-                </Link>
+  <Link to={`/user/${user?.id}`}>
+    <div id="nav-footer-heading" className="flex items-center gap-3">
+      <div id="nav-footer-avatar" className="w-12 h-12 overflow-hidden rounded-full border-2 border-gray-300">
+        <img
+          src={profile?.avatar}
+          alt="Avatar"
+          className="w-full h-full object-cover"
+        />
+      </div>
+      <div id="nav-footer-titlebox">
+        <span id="nav-footer-title" rel="noopener noreferrer" className="text-sm">
+          {profile ? profile.full_name.slice(0, 10) : "Guest"}
+        </span>
+        <span id="nav-footer-subtitle"></span>
+      </div>
+      <label htmlFor="nav-footer-toggle">
+        <i className="fas fa-caret-up"></i>
+      </label>
+    </div>
+  </Link>
+</div>
 
-            </div>
         </div>
     );
 };

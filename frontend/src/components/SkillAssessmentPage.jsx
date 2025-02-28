@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-// import { getQuestions, getRating, getFinalFeedback } from "../gemini/geminiService";
+import { getQuestions, getRating, getFinalFeedback } from "../gemini/geminiService";
 import { useLocation } from "react-router-dom";
-// import LoggedinNav from "../components/LoggedinNav";
-// import Sidebar from "../components/Sidebar";
+import LoggedinNav from "../components/LoggedinNav";
+import Sidebar from "../components/Sidebar";
 
 const SkillAssessmentPage = () => {
     const { skill } = useParams();
@@ -104,12 +104,12 @@ const SkillAssessmentPage = () => {
 
     return (
         <>
-            {/* <div className="hidden md:flex">
+            <div className="hidden md:flex">
                 <Sidebar toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
-            </div> */}
-            {/* <div>
+            </div>
+            <div>
                 <LoggedinNav />
-            </div> */}
+            </div>
 
             <div className={`h-screen flex flex-col justify-center items-center text-white px-4 md:px-8 ${isSidebarOpen ? "md:ml-[20%]" : "md:ml-[10%]"}`}>
                 {loading ? (

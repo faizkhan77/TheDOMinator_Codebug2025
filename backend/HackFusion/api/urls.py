@@ -13,6 +13,8 @@ from .views import (
     InvitationViewSet,
     UserSkillViewSet,
     JoinRequestViewSet,
+    recommend_teams,
+    recommend_users,
 )
 
 
@@ -37,6 +39,8 @@ urlpatterns = [
     path("login/", login_view, name="login"),
     path("signup/", signup_view, name="signup"),
     path("teams/<int:team_id>/kick/", kick_member_from_team, name="kick-member"),
+    path("recommend-teams/", recommend_teams, name="recommend-teams"),
+    path("recommend-users/<int:team_id>/", recommend_users, name="recommend-users"),
     path(
         "token/refresh/", TokenRefreshView.as_view(), name="token_refresh"
     ),  #  (to refresh JWT tokens)

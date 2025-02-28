@@ -116,11 +116,12 @@ const UserProfile = () => {
                 {/* Profile Card */}
                 <div className="bg-[#141414] rounded-2xl shadow-lg p-6 w-full">
   <div className="flex flex-col items-center text-center">
-    <img
-      src={profile?.avatar}
-      alt="User Avatar"
-      className="rounded-full w-36 md:w-48 border-4 border-gray-500 mb-4 object-cover h-36 md:h-48"
-    />
+  <img
+  src={profile?.avatar}
+  alt="User Avatar"
+  className="rounded-full w-44 md:w-56 border-4 border-gray-500 mb-4 object-cover h-44 md:h-56"
+/>
+
     <h4 className="text-2xl font-semibold text-white">{profile?.full_name}</h4>
     <p className="text-gray-400 text-lg">{profile?.role}</p>
     <p className="text-gray-500 text-sm">{profile?.location}</p>

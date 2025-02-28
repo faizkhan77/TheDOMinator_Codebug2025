@@ -146,23 +146,28 @@ const UsersList = () => {
                                             key={user.id}
                                             className="flex justify-between items-center p-4 mb-4 bg-gray-800 rounded-lg shadow-lg transition duration-300"
                                         >
-                                            <div className="flex items-center cursor-pointer" onClick={() => navigate(`/user/${user.id}`)}>
-                                                <img
+                                            <div
+                                                className="flex items-center cursor-pointer"
+                                                onClick={() => navigate(`/user/${user.id}`)}
+                                                >
+                                                <div className="w-12 h-12 rounded-full overflow-hidden mr-4 border-2 border-gray-300">
+                                                    <img
                                                     src={user.profile?.avatar}
                                                     alt="Avatar"
-                                                    className="w-12 h-12 rounded-full mr-4"
-                                                />
+                                                    className="w-full h-full object-cover"
+                                                    />
+                                                </div>
                                                 <div>
                                                     <h4 className="text-xl font-semibold text-white">
-                                                        {user.profile?.full_name} ({user.username})
+                                                    {user.profile?.full_name} ({user.username})
                                                     </h4>
                                                     <p className="text-sm text-gray-400">Role: {user.profile?.role}</p>
                                                     <p className="text-sm text-gray-400">
-                                                        Skills: {user.profile?.skills?.map(skill => skill.skill_name).join(", ")}
+                                                    Skills: {user.profile?.skills?.map(skill => skill.skill_name).join(", ")}
                                                     </p>
                                                 </div>
+                                                </div>
 
-                                            </div>
                                             <button
                                                 onClick={() => openInviteModal(user)}
                                                 className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg"

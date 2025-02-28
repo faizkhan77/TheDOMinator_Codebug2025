@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Sidebar from "../components/Sidebar";
 import LoggedinNav from "../components/LoggedinNav";
+import { useAuth } from "../AuthContext";
 
 const Team = () => {
     const location = useLocation();
@@ -13,40 +14,47 @@ const Team = () => {
     const profile = JSON.parse(localStorage.getItem("userProfile"));
     const userId = loggedInUser?.id;
     const [btnloading, btnsetLoading] = useState(false);
+    const { fetchUserProfile } = useAuth();
     const [showModal, setShowModal] = useState(false);
 
-    const [members, setMembers] = useState(team.members || []);
+    // ✅ Use optional chaining to prevent errors
+    const [members, setMembers] = useState(Array.isArray(team?.members) ? team.members : []);
 
-    if (!team) {
-        return <p>No team data found.</p>;
-    }
+
+    useEffect(() => {
+        if (team?.members) {
+            setMembers(team.members);
+        }
+    }, []);
+    
 
     const updateLocalStorageTeams = (updatedTeam) => {
         let teams = JSON.parse(localStorage.getItem("teams")) || [];
-
-        // Replace the updated team in the stored teams array
-        teams = teams.map((t) => (t.id === updatedTeam.id ? updatedTeam : t));
-
+        teams = teams.map((t) => 
+            t.id === updatedTeam.id ? { ...updatedTeam, members: updatedTeam.members || [] } : t
+        );
         localStorage.setItem("teams", JSON.stringify(teams));
     };
+    
 
-    // Update activities in localStorage
     const addActivity = (message, teamId) => {
         let activities = JSON.parse(localStorage.getItem("activities")) || [];
-        const activity = { message, teamId, timestamp: new Date().toISOString() }; // Include teamId and timestamp
-        activities.unshift(activity); // Add latest activity at the top
+        const activity = { message, teamId, timestamp: new Date().toISOString() };
+        activities.unshift(activity);
         localStorage.setItem("activities", JSON.stringify(activities));
     };
 
     const handleJoinTeam = async () => {
         if (team.team_type === "PRIVATE") {
-            setShowModal(true); // Show modal for private teams
+            setShowModal(true);
             return;
         }
 
         btnsetLoading(true);
         const token = localStorage.getItem("access");
-        if (!token) {
+        const userId = JSON.parse(localStorage.getItem("user"))?.id;
+
+        if (!token || !userId) {
             console.error("No access token found.");
             alert("You must be logged in to join a team.");
             btnsetLoading(false);
@@ -55,12 +63,26 @@ const Team = () => {
 
         try {
             if (team.team_type === "PUBLIC") {
-                // Directly join public teams
-                await joinPublicTeam();
-                alert("You have successfully joined the team!");
+                await axios.post(`/api/teams/${team.id}/join/`, {}, { 
+                    headers: { Authorization: `Bearer ${token}` } 
+                });
+
+                // ✅ Avoid directly modifying the team object
+                const updatedTeam = { ...team, members: [...(team.members || []), { id: userId }] };
+                updateLocalStorageTeams(updatedTeam);
+                setMembers(updatedTeam.members);
+
+                // ✅ Fetch latest user profile to ensure proper re-render
+                await fetchUserProfile(token, userId);
+
+                setTimeout(() => {
+                    alert("You have successfully joined the team!");
+                }, 500);
             } else {
-                // Send a join request for private teams (this won't be reached due to early return above)
-                await sendJoinRequest();
+                await axios.post(`/api/join-requests/`, { team_id: team.id }, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+
                 alert("Join request sent. Please wait for admin approval.");
             }
         } catch (error) {
@@ -68,55 +90,48 @@ const Team = () => {
             alert("Failed to join the team. Please try again.");
         }
 
-        
         btnsetLoading(false);
     };
 
     const joinPublicTeam = async () => {
         const token = localStorage.getItem("access");
-        const userId = JSON.parse(localStorage.getItem("user"))?.id; // ✅ Get user ID from local storage
-    
-        if (!token || !userId) {
+        const user = JSON.parse(localStorage.getItem("user"));
+
+        if (!token || !user?.id) {
             alert("User not authenticated. Please log in again.");
             return;
         }
-    
+
         try {
-            // ✅ Send request to join the public team
             await axios.post(
                 `/api/teams/${team.id}/join/`, 
                 {}, 
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-    
-            // ✅ Fetch updated user profile (includes new team in "teams[]")
-            await fetchUserProfile(token, userId);
-    
-            // ✅ Fetch and update teams after joining
-            await fetchAndUpdateMyTeams();
-    
-            alert("You have successfully joined the team!");
+
+            const updatedMembers = [...members, { id: user.id, name: user.name }];
+            setMembers(updatedMembers);
+
+            const updatedTeam = { ...team, members: updatedMembers };
+            updateLocalStorageTeams(updatedTeam);
+
+            setTimeout(() => {
+                alert("You have successfully joined the team!");
+            }, 500);
         } catch (error) {
             console.error("Failed to join public team:", error.response?.data || error.message);
             alert(error.response?.data?.detail || "Failed to join the team. Please try again.");
         }
     };
-    
-    
-    
 
     const sendJoinRequest = async () => {
         const token = localStorage.getItem("access");
 
         try {
-            // Sending the join request to the backend
-            await axios.post(
-                `/api/join-requests/`,  // Correct endpoint for join request
-                { team_id: team.id },    // Ensure the team_id is passed
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            await axios.post(`/api/join-requests/`, { team_id: team.id }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
 
-            // Alert user about the request being sent
             alert("Join request sent. Please wait for admin approval.");
             setShowModal(false);
         } catch (error) {
@@ -124,8 +139,6 @@ const Team = () => {
             alert("Failed to send join request. Please try again.");
         }
     };
-
-
 
 
     const handleLeaveTeam = async () => {
