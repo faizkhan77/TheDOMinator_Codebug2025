@@ -240,165 +240,90 @@ const EditProfile = () => {
 
     return (
         <>
-            <div className="flex flex-col md:flex-row">
-                {/* Sidebar */}
-                <div className="hidden md:flex">
-                    <Sidebar toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
+            <div className="flex flex-col md:flex-row bg-[#0a0a0a] text-white min-h-screen">
+    {/* Sidebar */}
+    <div className="hidden md:flex">
+        <Sidebar toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
+    </div>
+
+    {/* Main Content */}
+    <div className="flex-1">
+        <LoggedinNav />
+
+        <div className={`mt-4 flex justify-center items-center px-4 sm:px-6 ${isSidebarOpen ? "md:ml-[20%]" : "md:ml-[10%]"}`}>
+            <div className="w-full max-w-4xl p-6 bg-[#141414] rounded-2xl shadow-xl">
+                <h1 className="text-2xl sm:text-3xl font-bold text-center text-white mb-6 sm:mb-8">Edit Profile</h1>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
+                    {/* Personal Details Section */}
+                    <div>
+                        <div className="flex flex-col gap-4 mb-6">
+                            <label className="font-semibold">Avatar</label>
+                            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                                <div className="w-24 sm:w-32 h-24 sm:h-32 rounded-full flex justify-center items-center overflow-hidden border-4 border-white shadow-lg">
+                                    <img src={profile?.avatar || "/avatar.svg"} alt="Avatar Preview" className="w-full h-full object-cover" />
+                                </div>
+                                <label className="cursor-pointer bg-white hover:bg-white text-black px-4 py-2 rounded-full shadow-md transition duration-300">
+                                    Upload
+                                    <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+                                </label>
+                            </div>
+                        </div>
+
+                        <h2 className="text-xl sm:text-2xl font-semibold mb-4">Personal Details</h2>
+                        <div className="space-y-4">
+                            {['full_name', 'role', 'experience'].map((field, index) => (
+                                <div key={index} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                    <label className="w-32">{field.replace('_', ' ')}</label>
+                                    <input type="text" name={field} value={profileData[field]} onChange={handleChange} 
+                                        className="w-full bg-[#1a1a1a] p-2 rounded focus:outline-none focus:ring-2 focus:ring-white transition duration-300" />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Social Links Section */}
+                    <div>
+                        <h2 className="text-xl sm:text-2xl font-semibold mb-4">Social Links</h2>
+                        <div className="space-y-4">
+                            {[{ name: "github", icon: <FaGithub className="text-white text-2xl" /> },
+                              { name: "linkedin", icon: <FaLinkedin className="text-blue-500 text-2xl" /> },
+                              { name: "instagram", icon: <FaInstagram className="text-pink-500 text-2xl" /> },
+                              { name: "portfolio", icon: <FaLink className="text-green-500 text-2xl" /> }].map((item, index) => (
+                                <div key={index} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                    {item.icon}
+                                    <input type="text" name={item.name} value={profileData[item.name]} onChange={handleChange} 
+                                        className="w-full bg-[#1a1a1a] p-2 rounded focus:outline-none focus:ring-2 focus:ring-white transition duration-300" />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
 
-                {/* Main Content */}
-                <div className="flex-1">
-                    <LoggedinNav />
+                {/* Bio & Skills Section */}
+                <div className="mt-6">
+                    <h2 className="text-xl sm:text-2xl font-semibold mb-4">Bio</h2>
+                    <textarea name="bio" value={profileData.bio} onChange={handleChange} rows="4" 
+                        className="w-full bg-[#1a1a1a] p-2 rounded focus:outline-none focus:ring-2 focus:ring-white transition duration-300"></textarea>
+                </div>
 
-                    <div className={`min-h-screen mt-4 text-gray-50 flex justify-center items-center px-4 sm:px-6 ${isSidebarOpen ? "md:ml-[20%]" : "md:ml-[10%]"}`}>
-                        <div className="w-full max-w-4xl p-6 bg-gray-800 rounded-2xl shadow-xl">
-                            <h1 className="text-2xl sm:text-3xl font-bold text-center text-purple-500 mb-6 sm:mb-8">Edit Profile</h1>
+                <div className="mt-6">
+                    <h2 className="text-xl sm:text-2xl font-semibold mb-4">Skills</h2>
+                    <textarea name="skills" value={profileData.skills} onChange={handleChange} rows="4" 
+                        className="w-full bg-[#1a1a1a] p-2 rounded focus:outline-none focus:ring-2 focus:ring-white transition duration-300"></textarea>
+                </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
-                                {/* Personal Details Section */}
-                                <div>
-                                    <div className="flex flex-col gap-4 mb-6">
-                                        <label className="font-semibold">Avatar</label>
-                                        <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-                                            <div className="w-24 sm:w-32 h-24 sm:h-32 rounded-full flex justify-center items-center overflow-hidden border-4 border-purple-500 shadow-lg">
-                                                {(
-                                                    <img
-                                                        src={profile?.avatar || "/avatar.svg"}
-                                                        alt="Avatar Preview"
-                                                        className="w-full h-full object-cover"
-                                                    />
+                <div className="flex justify-center mt-6 sm:mt-8">
+                <button onClick={handleSaveProfile} className="bg-white hover:bg-gray-300 text-black py-3 px-8 rounded-full shadow-md transition duration-300">
+    {btnloading ? <div className="animate-spin w-6 h-6 border-4 border-t-transparent border-black rounded-full"></div> : "Save Changes"}
+</button>
 
-                                                )}
-                                            </div>
-                                            <label className="cursor-pointer bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-full shadow-md transition duration-300">
-                                                Upload
-                                                <input
-                                                    type="file"
-                                                    accept="image/*"
-                                                    className="hidden"
-                                                    onChange={handleAvatarChange}
-                                                />
-                                            </label>
-                                        </div>
-                                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-                                    <h2 className="text-xl sm:text-2xl font-semibold mb-4">Personal Details</h2>
-                                    <div className="space-y-4">
-                                        {["full_name", "role", "experience"].map((field, index) => (
-                                            <div key={index} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                                                <label className="w-32">{field.replace("_", " ")}</label>
-                                                <input
-                                                    type="text"
-                                                    name={field}
-                                                    value={profileData[field]}
-                                                    onChange={handleChange}
-                                                    placeholder={`Enter your ${field.replace("_", " ")}`}
-                                                    className="w-full bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300"
-                                                />
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Social Links Section */}
-                                <div>
-                                    <h2 className="text-xl sm:text-2xl font-semibold mb-4">Social Links</h2>
-                                    <div className="space-y-4">
-                                        {[
-                                            { name: "github", icon: <FaGithub className="text-purple-500 text-2xl" /> },
-                                            { name: "linkedin", icon: <FaLinkedin className="text-blue-500 text-2xl" /> },
-                                            { name: "instagram", icon: <FaInstagram className="text-pink-500 text-2xl" /> },
-                                            { name: "portfolio", icon: <FaLink className="text-green-500 text-2xl" /> },
-                                        ].map((item, index) => (
-                                            <div key={index} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                                                {item.icon}
-                                                <input
-                                                    type="text"
-                                                    name={item.name}
-                                                    value={profileData[item.name]}
-                                                    onChange={handleChange}
-                                                    placeholder={`${item.name.charAt(0).toUpperCase() + item.name.slice(1)} URL`}
-                                                    className="w-full bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300"
-                                                />
-                                                {errors[item.name] && <p className="text-red-500 text-sm">{errors[item.name]}</p>}
-                                            </div>
-                                        ))}
-
-                                        {/* Email Field */}
-                                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-4">
-                                            <FaEnvelope className="text-green-500 text-2xl" />
-                                            <input
-                                                type="email"
-                                                name="email"
-                                                value={profileData.email}
-                                                onChange={handleChange}
-                                                placeholder="Email Address"
-                                                className="w-full bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300"
-                                            />
-                                            {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
-                                        </div>
-
-                                        {/* Location Field */}
-                                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-4">
-                                            <FaMapMarkerAlt className="text-green-500 text-2xl" />
-                                            <input
-                                                type="text"
-                                                name="location"
-                                                value={profileData.location}
-                                                onChange={handleChange}
-                                                placeholder="Location"
-                                                className="w-full bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300"
-                                            />
-                                            {errors.location && <p className="text-red-500 text-sm">{errors.location}</p>}
-                                        </div>
-                                    </div>
-                                </div>
-
-
-                                {/* Bio Section */}
-                                <div div className="col-span-1 sm:col-span-2" >
-                                    <h2 className="text-xl sm:text-2xl font-semibold mb-4">Bio</h2>
-                                    <textarea
-                                        name="bio"
-                                        value={profileData.bio}
-                                        onChange={handleChange}
-                                        rows="4"
-                                        placeholder="Enter your skills"
-                                        className="w-full bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300"
-                                    ></textarea>
-                                </div >
-
-                                {/* Skills Section */}
-                                <div div className="col-span-1 sm:col-span-2" >
-                                    <h2 className="text-xl sm:text-2xl font-semibold mb-4">Skills</h2>
-                                    <textarea
-                                        name="skills"
-                                        value={profileData.skills}
-                                        onChange={handleChange}
-                                        rows="4"
-                                        placeholder="Enter your skills"
-                                        className="w-full bg-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300"
-                                    ></textarea>
-                                </div >
-                            </div >
-
-                            <div className="flex justify-center mt-6 sm:mt-8">
-                                <button
-                                    onClick={handleSaveProfile}
-                                    className="bg-purple-500 hover:bg-purple-800 text-white py-3 px-8 rounded-full shadow-md transition duration-300 flex items-center justify-center h-12 w-50 text-lg"
-                                >
-                                    {btnloading ? (
-                                        <div className="animate-spin w-6 h-6 border-4 border-t-transparent border-white rounded-full"></div>
-                                    ) : (
-                                        "Save Changes"
-                                    )}
-                                </button>
-                            </div>
-
-                        </div >
-                    </div >
-                </div >
-            </div >
 
         </>
 
