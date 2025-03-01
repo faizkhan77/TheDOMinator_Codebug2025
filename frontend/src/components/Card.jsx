@@ -21,9 +21,9 @@ const Card = ({ project }) => {
           </div>
           <div className="glass" />
           <div className="content">
-            <span className="title">{project.title}</span>
-            <span className="text">{project.summary}</span>
-          </div>
+      <span className="title">{project.title || "Untitled Project"}</span>
+      <span className="text">{project.summary || "No description available."}</span>
+    </div>
           <div className="bottom">
             <div className="social-buttons-container">
               <button className="social-button .social-button1">

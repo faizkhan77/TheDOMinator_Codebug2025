@@ -9,6 +9,7 @@ import LoggedinNav from "../components/LoggedinNav";
 import SkillAssessmentModal from "../components/SkillAssessmentModal";
 import "./Scrollbar.css"
 import Card from "../components/Card";
+import AddProjectForm from "../components/AddProjectForm";
 
 const UserProfile = () => {
     const [user, setUser] = useState(null)
@@ -21,6 +22,7 @@ const UserProfile = () => {
     const loggedInUserProfile = JSON.parse(localStorage.getItem("userProfile")); // ✅ Get logged-in user profile
     const [selectedSkill, setSelectedSkill] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
         const fetchdata = async () => {
@@ -79,7 +81,7 @@ const UserProfile = () => {
         navigate(`/assessment/${skill.skill_name}`, { state: { skillId: skill.id } }); // Redirect to assessment page
     };
 
-    console.log(profile?.projects[0].title);
+    // console.log(profile?.projects[0].title);
 
     return (
         <>
@@ -259,26 +261,48 @@ const UserProfile = () => {
               </div>
 
             {/* Projects Showcase - New Section */}
-            <div className="bg-[#141414] rounded-2xl shadow-lg p-6 w-full md:col-span-2 relative">
+            <div className="bg-[#141414] rounded-2xl mt-4 shadow-lg p-6 w-full md:col-span-2 relative z-0">
               <div className="flex justify-between items-center mb-4">
                 <h6 className="text-white text-lg font-semibold">Projects Showcase</h6>
-                <button className="bg-[#1f1f1f] text-white px-4 py-2 rounded-lg shadow-md hover:bg-[#292929] transition flex items-center gap-2">
-                  <span className="text-sm font-medium">Add Project</span>
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"></path>
-                  </svg>
-                </button>
+                <button
+        onClick={() => setIsOpen(true)}
+        className="bg-[#1f1f1f] text-white px-4 py-2 rounded-lg shadow-md hover:bg-[#292929] transition flex items-center gap-2"
+      >
+        <span className="text-sm font-medium">Add Project</span>
+        <svg
+          className="w-5 h-5 text-white"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"></path>
+        </svg>
+      </button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {profile?.projects.map((project) => (
-                  <Card key={project.id} project={project} />
-                ))}
+                {Array.isArray(profile?.projects) && profile.projects.length > 0 ? (
+                  profile.projects
+                    .filter((project) => project && project.title) // Ensure project is not null/undefined
+                    .map((project) => <Card key={project.id} project={project} />)
+                ) : (
+                  <p className="text-gray-500 text-center col-span-3">No projects added</p>
+                )}
               </div>
+
+
             </div>
 
             </>
           )}
+
+
+          {/* Render the form modal if open */}
+      {isOpen && <AddProjectForm onClose={() => setIsOpen(false)} />}
         </div>
+
+
       </>
       
 

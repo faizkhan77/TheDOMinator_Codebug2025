@@ -15,7 +15,7 @@ from .views import (
     JoinRequestViewSet,
     recommend_teams,
     recommend_users,
-    UserProjectViewSet
+    UserProjectViewSet,
 )
 
 
