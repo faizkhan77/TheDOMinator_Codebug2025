@@ -3,11 +3,26 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const API_KEY = import.meta.env.VITE_API_KEY;
 const genAI = new GoogleGenerativeAI(API_KEY);
 
+const listModels = async () => {
+  try {
+    const response = await genAI.listModels();
+    console.log("Available models:", response.models);
+  } catch (error) {
+    console.error("Error listing models:", error);
+  }
+};
+
 export const getQuestions = async (skill) => {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-    const prompt = `Ask 15 technical questions related to the skill: ${skill}. Theoretical questions are preferred instead of practicals.
-    Format: "Question: ..."`;
+    // listModels();
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const prompt = `Ask 15 theoretical technical questions related to ${skill}, without any introduction or explanation.
+Only provide the questions in the format:
+1. Question...
+2. Question...
+3. Question...
+...
+15. Question...`;
 
     const result = await model.generateContent(prompt);
     const responseText =
@@ -26,7 +41,7 @@ export const getQuestions = async (skill) => {
 
 export const getRating = async (question, answer) => {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
     const prompt = `Rate the following answer on a scale of 1-10 and provide improvement suggestions and ensure to avoid code snippets.
     Question: ${question}
     Answer: ${answer}
@@ -66,7 +81,7 @@ export const getFinalFeedback = async (skill, ratings) => {
     const totalScore = validRatings.reduce((sum, r) => sum + r, 0);
     const maxScore = validRatings.length * 10;
 
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
     const prompt = `Provide a concise performance review for a person who completed a ${skill} assessment. 
     Their total score is ${totalScore} out of ${maxScore}. 
     The review should highlight their strengths based on their performance and suggest areas for improvement if needed. 
