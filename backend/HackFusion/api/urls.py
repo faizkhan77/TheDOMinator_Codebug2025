@@ -16,6 +16,8 @@ from .views import (
     recommend_teams,
     recommend_users,
     UserProjectViewSet,
+    PDFUploadView,
+    chat_with_pdfs,
 )
 
 
@@ -47,4 +49,6 @@ urlpatterns = [
     path(
         "token/refresh/", TokenRefreshView.as_view(), name="token_refresh"
     ),  #  (to refresh JWT tokens)
+    path("upload-pdf/", PDFUploadView.as_view(), name="upload-pdf"),
+    path("chat/", chat_with_pdfs, name="chat"),
 ]
