@@ -74,7 +74,7 @@ const Login = () => {
                         className="w-full bg-white text-black py-3 rounded-md hover:bg-gray-300 focus:outline-none transition duration-300 flex justify-center items-center"
                         disabled={loading}
                     >
-                        {loading ? <span className="spinner"></span> : "Login"}
+                        {loading ? <span className="spinner bg-black"></span> : "Login"}
                     </button>
                 </form>
                 <div className="mt-8 text-center">

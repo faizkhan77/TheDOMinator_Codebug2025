@@ -117,39 +117,65 @@ const TeamEdit = () => {
     };
 
     return (
-        <>
-            <div className="hidden md:flex">
-                <Sidebar toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
-            </div>
-            <div>
-                <LoggedinNav />
+       <>
+    <div className="flex flex-col min-h-screen">
+        {/* Navigation */}
+        <div className="w-full">
+            <LoggedinNav />
+        </div>
+
+        {/* Main Container */}
+        <div className="flex flex-1">
+            {/* Sidebar - Hidden on mobile */}
+            <div className="hidden md:block fixed h-full">
+                <Sidebar 
+                    toggleSidebar={toggleSidebar} 
+                    isSidebarOpen={isSidebarOpen} 
+                />
             </div>
 
-            <div
-                className="min-h-screen flex items-center justify-center p-4 transition-all duration-300 lg:ml-[20%] md:ml-[10%]"
-            >
-                <div className="bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-lg sm:max-w-md md:max-w-lg lg:max-w-2xl xl:max-w-2xl text-gray-200">
-                    <h1 className="text-3xl font-bold mb-6 text-center text-lg sm:text-2xl md:text-3xl">
+            {/* Form Section */}
+            <div className="flex-1 flex items-center justify-center p-4 transition-all duration-300 md:ml-[10%] lg:ml-[20%]">
+                <div className="w-full max-w-2xl bg-[#141414] rounded-lg shadow-xl p-6 text-gray-200">
+                    <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-center">
                         {team ? "Edit Team" : "Create Team"}
                     </h1>
+
                     <form onSubmit={handleSubmit} className="space-y-6">
-                        <div>
-                            <label className="block text-sm font-medium mb-2" htmlFor="name">
-                                Name:
-                            </label>
-                            <input
-                                type="text"
-                                name="name"
-                                id="name"
-                                value={formData.name}
-                                onChange={handleChange}
-                                required
-                                className="w-full px-4 py-2 bg-gray-700 text-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                            />
+                        {/* Grid layout for form fields */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label htmlFor="name" className="block text-sm font-medium">
+                                    Name:
+                                </label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    id="name"
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                    required
+                                    className="w-full px-4 py-2 bg-[#0a0a0a] text-gray-200 rounded-lg focus:ring-2 focus:ring-white focus:outline-none"
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label htmlFor="looking_for" className="block text-sm font-medium">
+                                    Looking For:
+                                </label>
+                                <input
+                                    type="text"
+                                    name="looking_for"
+                                    id="looking_for"
+                                    value={formData.looking_for}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 bg-[#0a0a0a] text-gray-200 rounded-lg focus:ring-2 focus:ring-white focus:outline-none"
+                                />
+                            </div>
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-medium mb-2" htmlFor="description">
+                        <div className="space-y-2">
+                            <label htmlFor="description" className="block text-sm font-medium">
                                 Description:
                             </label>
                             <textarea
@@ -157,12 +183,12 @@ const TeamEdit = () => {
                                 id="description"
                                 value={formData.description}
                                 onChange={handleChange}
-                                className="w-full px-4 py-2 bg-gray-700 text-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                            ></textarea>
+                                className="w-full px-4 py-2 bg-[#0a0a0a] text-gray-200 rounded-lg focus:ring-2 focus:ring-white focus:outline-none min-h-[100px]"
+                            />
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-medium mb-2" htmlFor="project_idea">
+                        <div className="space-y-2">
+                            <label htmlFor="project_idea" className="block text-sm font-medium">
                                 Project Idea:
                             </label>
                             <textarea
@@ -170,59 +196,47 @@ const TeamEdit = () => {
                                 id="project_idea"
                                 value={formData.project_idea}
                                 onChange={handleChange}
-                                className="w-full px-4 py-2 bg-gray-700 text-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                            ></textarea>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium mb-2" htmlFor="looking_for">
-                                Looking For:
-                            </label>
-                            <input
-                                type="text"
-                                name="looking_for"
-                                id="looking_for"
-                                value={formData.looking_for}
-                                onChange={handleChange}
-                                className="w-full px-4 py-2 bg-gray-700 text-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                                className="w-full px-4 py-2 bg-[#0a0a0a] text-gray-200 rounded-lg focus:ring-2 focus:ring-white focus:outline-none min-h-[100px]"
                             />
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-medium mb-2" htmlFor="team_type">
-                                Team Type:
-                            </label>
-                            <select
-                                name="team_type"
-                                id="team_type"
-                                value={formData.team_type}
-                                onChange={handleChange}
-                                className="w-full px-4 py-2 bg-gray-700 text-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                            >
-                                <option value="PUBLIC">Public</option>
-                                <option value="PRIVATE">Private</option>
-                            </select>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label htmlFor="team_type" className="block text-sm font-medium">
+                                    Team Type:
+                                </label>
+                                <select
+                                    name="team_type"
+                                    id="team_type"
+                                    value={formData.team_type}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 bg-[#0a0a0a] text-gray-200 rounded-lg focus:ring-2 focus:ring-white focus:outline-none"
+                                >
+                                    <option value="PUBLIC">Public</option>
+                                    <option value="PRIVATE">Private</option>
+                                </select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label htmlFor="members_limit" className="block text-sm font-medium">
+                                    Members Limit:
+                                </label>
+                                <input
+                                    type="number"
+                                    name="members_limit"
+                                    id="members_limit"
+                                    value={formData.members_limit}
+                                    onChange={handleChange}
+                                    min="1"
+                                    className="w-full px-4 py-2 bg-[#0a0a0a] text-gray-200 rounded-lg focus:ring-2 focus:ring-white focus:outline-none"
+                                />
+                            </div>
                         </div>
 
-
-                        <div>
-                            <label className="block text-sm font-medium mb-2" htmlFor="members_limit">
-                                Members Limit:
-                            </label>
-                            <input
-                                type="number"
-                                name="members_limit"
-                                id="members_limit"
-                                value={formData.members_limit}
-                                onChange={handleChange}
-                                min="1"
-                                className="w-full px-4 py-2 bg-gray-700 text-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                            />
-                        </div>
-
+                        {/* Submit Button */}
                         <button
                             type="submit"
-                            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 rounded-lg shadow-md transition-all duration-300 flex justify-center items-center"
+                            className="w-full bg-white hover:bg-gray-400 text-black font-bold py-2 rounded-lg shadow-md transition-all duration-300 flex justify-center items-center"
                         >
                             {btnloading ? (
                                 <div className="animate-spin w-6 h-6 border-4 border-t-transparent border-white rounded-full"></div>
@@ -230,11 +244,12 @@ const TeamEdit = () => {
                                 team ? "Save Changes" : "Create Team"
                             )}
                         </button>
-
                     </form>
                 </div>
             </div>
-        </>
+        </div>
+    </div>
+</>
     );
 };
 

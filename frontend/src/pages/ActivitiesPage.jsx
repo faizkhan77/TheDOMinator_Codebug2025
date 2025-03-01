@@ -42,34 +42,44 @@ const ActivitiesPage = () => {
                 <LoggedinNav />
             </div>
             <div
-                className={`px-8 py-6 transition-all duration-300 ${isSidebarOpen ? "md:ml-[20%]" : "md:ml-[10%]"}`}
-                style={{ height: "97vh", overflowY: "auto" }} // Fixed height with scrollbar
-            >
-                <h2 className="text-3xl font-semibold text-white mb-6">Recent Activities</h2>
+  className={`px-8 py-6 transition-all duration-300 flex ${isSidebarOpen ? "md:ml-[20%]" : "md:ml-[10%]"}`}
+  style={{ height: "97vh", backgroundColor: "#0a0a0a" }} // Dark background
+>
+  {/* Scrollable Activities Section */}
+  <div className="w-3/4 h-[80vh] overflow-y-auto pr-4">
+    <h2 className="text-3xl font-semibold text-white mb-6">Recent Activities</h2>
 
-                {/* Display Activities */}
-                {activities.length > 0 ? (
-                    <div className="space-y-8">
-                        {activities
-                            .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)) // Sort by newest first
-                            .map((activity, index) => ( // No slice(), display all
-                                <div
-                                    key={index}
-                                    className="bg-gray-800 p-8 rounded-2xl shadow-lg hover:shadow-xl hover:bg-gray-700 transition-all duration-300"
-                                >
-                                    <div className="text-gray-300 text-base mt-4 italic">
-                                        "{activity.message}"
-                                    </div>
-                                    <div className="text-gray-400 text-sm mt-2">
-                                        {format(new Date(activity.timestamp), "EEEE, MMMM d, yyyy - hh:mm a")}
-                                    </div>
-                                </div>
-                            ))}
-                    </div>
-                ) : (
-                    <p className="text-gray-500 text-center">No recent activities.</p>
-                )}
+    {activities.length > 0 ? (
+      <div className="space-y-8">
+        {activities
+          .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+          .map((activity, index) => (
+            <div
+              key={index}
+              className="bg-[#141414] p-8 rounded-2xl shadow-lg hover:shadow-xl hover:bg-gray-700 transition-all duration-300"
+            >
+              <div className="text-white text-base mt-4 italic">"{activity.message}"</div>
+              <div className="text-gray-400 text-sm mt-2">
+                {format(new Date(activity.timestamp), "EEEE, MMMM d, yyyy - hh:mm a")}
+              </div>
             </div>
+          ))}
+      </div>
+    ) : (
+      <p className="text-gray-500 text-center">No recent activities.</p>
+    )}
+  </div>
+
+  {/* Image on the Right */}
+  <div className="w-1/4 flex justify-center items-center">
+    <img
+      src="https://i.pinimg.com/474x/dc/8a/a2/dc8aa2ee498140243ece775d2fae468a.jpg"
+      alt=""
+      className="rounded-2xl shadow-lg object-cover w-full"
+    />
+  </div>
+</div>
+
 
         </>
     );

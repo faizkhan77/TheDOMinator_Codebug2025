@@ -52,68 +52,73 @@ const Signin = () => {
             </div>
 
 
-            <div className="bg-[#00040f] text-white font-sans min-h-screen flex items-center justify-center">
-                <div className="bg-gray-800 bg-opacity-90 w-full max-w-md p-8 rounded-xl shadow-2xl">
-                    <h1 className="text-3xl font-bold text-center mb-6 text-purple-300">Create Account</h1>
-                    <form className="space-y-6" onSubmit={handleSubmit}>
-                        <div>
-                            <label htmlFor="username" className="block text-sm font-medium mb-2">
-                                Username
-                            </label>
-                            <input
-                                type="text"
-                                name="username"
-                                id="username"
-                                value={formData.username}
-                                onChange={handleChange}
-                                className="w-full bg-gray-700 border border-transparent rounded-md px-4 py-3 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none placeholder-gray-400"
-                                placeholder="Enter your username"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium mb-2">
-                                Password
-                            </label>
-                            <input
-                                type="password"
-                                name="password"
-                                id="password"
-                                value={formData.password} onChange={handleChange} required
-                                className="w-full bg-gray-700 border border-transparent rounded-md px-4 py-3 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none placeholder-gray-400"
-                                placeholder="Enter your password"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="confirmPassword" className="block text-sm font-medium mb-2">
-                                Confirm Password
-                            </label>
-                            <input
-                                type="password"
-                                id="confirmPassword"
-                                name="confirmPassword"
-                                value={formData.confirmPassword} onChange={handleChange} required
-                                className="w-full bg-gray-700 border border-transparent rounded-md px-4 py-3 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none placeholder-gray-400"
-                                placeholder="Confirm your password"
-                            />
-                        </div>
-                        <button
-                            type="submit"
-                            className="w-full bg-purple-500 text-white py-3 rounded-md hover:bg-purple-400 focus:outline-none transition duration-300 flex justify-center items-center"
-                            disabled={loading}
-                        >
-                            {loading ? <span className="spinner"></span> : "Sign Up"}
-                        </button>
-                    </form>
-                    <div className="mt-8 text-center">
-                        <p className="text-sm text-gray-400">
-                            Already have an account?{" "}
-                            <span onClick={() => navigate("/login")} className="cursor-pointer text-purple-500 hover:underline">
-                                Login
-                            </span>
-                        </p>
-                    </div>
-                </div>
+            <div className="bg-[#0a0a0a] text-white font-sans min-h-screen flex items-center justify-center">
+    <div className="bg-[#141414] bg-opacity-90 w-full max-w-md p-8 rounded-xl shadow-2xl">
+        <h1 className="text-3xl font-bold text-center mb-6 text-white">Create Account</h1>
+        <form className="space-y-6" onSubmit={handleSubmit}>
+            <div>
+                <label htmlFor="username" className="block text-sm font-medium mb-2">
+                    Username
+                </label>
+                <input
+                    type="text"
+                    name="username"
+                    id="username"
+                    value={formData.username}
+                    onChange={handleChange}
+                    className="w-full bg-[#1f1f1f] border border-transparent rounded-md px-4 py-3 text-sm focus:ring-2 focus:ring-gray-500 focus:outline-none placeholder-gray-400"
+                    placeholder="Enter your username"
+                />
             </div>
+            <div>
+                <label htmlFor="password" className="block text-sm font-medium mb-2">
+                    Password
+                </label>
+                <input
+                    type="password"
+                    name="password"
+                    id="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                    className="w-full bg-[#1f1f1f] border border-transparent rounded-md px-4 py-3 text-sm focus:ring-2 focus:ring-gray-500 focus:outline-none placeholder-gray-400"
+                    placeholder="Enter your password"
+                />
+            </div>
+            <div>
+                <label htmlFor="confirmPassword" className="block text-sm font-medium mb-2">
+                    Confirm Password
+                </label>
+                <input
+                    type="password"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    required
+                    className="w-full bg-[#1f1f1f] border border-transparent rounded-md px-4 py-3 text-sm focus:ring-2 focus:ring-gray-500 focus:outline-none placeholder-gray-400"
+                    placeholder="Confirm your password"
+                />
+            </div>
+            <button
+                type="submit"
+                className="w-full bg-white text-black py-3 rounded-md hover:bg-gray-300 focus:outline-none transition duration-300 flex justify-center items-center"
+                disabled={loading}
+            >
+                {loading ? <span className="spinner bg-black"></span> : "Sign Up"}
+            </button>
+        </form>
+        <div className="mt-8 text-center">
+            <p className="text-sm text-gray-400">
+                Already have an account?{" "}
+                <span onClick={() => navigate("/login")} className="cursor-pointer text-white hover:underline">
+                    Login
+                </span>
+            </p>
+        </div>
+    </div>
+</div>
+
 
 
         </>

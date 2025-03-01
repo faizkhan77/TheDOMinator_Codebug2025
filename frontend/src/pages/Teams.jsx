@@ -79,62 +79,75 @@ const Teams = () => {
             <LoggedinNav />
 
             <div
-                className={`px-8 py-6 transition-all duration-300 ${isSidebarOpen ? "md:ml-[20%]" : "md:ml-[10%]"}`}
-            >
-                <h2 className="text-3xl font-semibold text-white mb-6">Teams</h2>
+    className={`px-8 py-6 transition-all duration-300 ${isSidebarOpen ? "md:ml-[20%]" : "md:ml-[10%]"}`}
+    style={{ backgroundColor: '#0a0a0a' }}
+>
+    <h2 className="text-3xl font-semibold text-white mb-6">Teams</h2>
 
-                {/* Search Input */}
-                <input
-                    type="text"
-                    placeholder="Search teams by name or required roles..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full p-3 mb-6 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition duration-300"
-                />
+    {/* Search Input */}
+    <input
+        type="text"
+        placeholder="Search teams by name or required roles..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        className="w-full p-3 mb-6 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition duration-300"
+        style={{ backgroundColor: '#141414' }}
+    />
 
-                {/* Create Team Button */}
-                <Link to="/team/new">
-                    <button className="w-full p-3 bg-primary text-white font-semibold rounded-lg mb-6 hover:bg-primary-dark transition duration-300">
-                        Create Team
-                    </button>
-                </Link>
+    {/* Create Team Button */}
+    <Link to="/team/new">
+        <button className="w-full p-3 bg-primary text-white font-semibold rounded-lg mb-6 hover:bg-primary-dark transition duration-300">
+            Create Team
+        </button>
+    </Link>
 
-                {/* Loading Spinner */}
-                {isLoading ? (
-                    <div className="flex justify-center items-center h-[50vh]">
-                        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 border-solid"></div>
-                    </div>
-                ) : (
-                    <>
-                        {/* Display Teams */}
-                        {filteredTeams.length > 0 ? (
-                            <div
-                                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto"
-                                style={{ maxHeight: '70vh' }} // Adjust the height as needed
-                            >
-                                {filteredTeams.map((team) => (
-                                    <div
-                                        key={team.id}
-                                        className="bg-gray-800 text-white p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300"
-                                    >
-                                        <Link to={`/team/${team.id}`} state={{ team }} className="block">
-                                            <h3 className="text-xl font-semibold mb-2">{team.name}</h3>
-                                            <p className="text-sm text-gray-400 mb-4">Looking for: {team.looking_for || "Not specified"}</p>
-                                            <p className="text-sm mb-4">{team.description}</p>
-                                            <p className="text-sm text-gray-400 mb-2">Admin: {team.admin.username}</p>
-                                            <p className="text-sm text-gray-400">Members Limit: {team.members_limit}</p>
-                                            <p className="text-sm text-gray-400">Type: {team.team_type}</p>
-                                            <p className="text-sm text-gray-400 mb-2">Created: {getTimeAgo(team.created)}</p>
-                                        </Link>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <p className="text-white">No teams found.</p>
-                        )}
-                    </>
-                )}
-            </div>
+    {/* Loading Spinner */}
+    {isLoading ? (
+        <div className="flex justify-center items-center h-[50vh]">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 border-solid"></div>
+        </div>
+    ) : (
+        <>
+            {/* Display Teams */}
+            {filteredTeams.length > 0 ? (
+                <div
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto"
+                    style={{ maxHeight: '70vh' }}
+                >
+                    {filteredTeams.map((team) => (
+                        <div
+                            key={team.id}
+                            className="text-white p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300"
+                            style={{ backgroundColor: '#141414' }}
+                        >
+                            <Link to={`/team/${team.id}`} state={{ team }} className="block">
+                                <h3 className="text-xl font-semibold mb-2 text-white">{team.name}</h3>
+                                <p className="text-sm mb-4" style={{ color: '#a0a0a0' }}>
+                                    Looking for: {team.looking_for || "Not specified"}
+                                </p>
+                                <p className="text-sm mb-4 text-white">{team.description}</p>
+                                <p className="text-sm mb-2" style={{ color: '#a0a0a0' }}>
+                                    Admin: {team.admin.username}
+                                </p>
+                                <p className="text-sm" style={{ color: '#a0a0a0' }}>
+                                    Members Limit: {team.members_limit}
+                                </p>
+                                <p className="text-sm" style={{ color: '#a0a0a0' }}>
+                                    Type: {team.team_type}
+                                </p>
+                                <p className="text-sm mb-2" style={{ color: '#a0a0a0' }}>
+                                    Created: {getTimeAgo(team.created)}
+                                </p>
+                            </Link>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <p className="text-white">No teams found.</p>
+            )}
+        </>
+    )}
+</div>
         </>
     );
 };

@@ -186,11 +186,11 @@ const Invitations = () => {
                             {invitations.length > 0 ? (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[70vh] overflow-y-auto">
                                     {invitations.map((invite) => (
-                                        <div key={invite.id} className="bg-gray-800 text-white p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
+                                        <div key={invite.id} className="bg-[#141414] text-white p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
                                             <h3 className="text-xl font-semibold mb-2">{invite.team.name}</h3>
                                             <p className="text-sm text-gray-400 mb-4">Invited by: {invite.sender.username}</p>
                                             <div className="flex justify-between">
-                                                <button onClick={() => acceptInvitation(invite)} className="bg-green-500 px-4 py-2 rounded-lg text-white hover:bg-green-600 transition">
+                                                <button onClick={() => acceptInvitation(invite)} className="bg-white  px-4 py-2 rounded-lg text-black hover:bg-gray-600 transition">
                                                     {acceptLoading ? (
                                                         <div className="animate-spin w-6 h-6 border-4 border-t-transparent border-white rounded-full"></div>
                                                     ) : (
