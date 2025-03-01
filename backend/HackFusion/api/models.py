@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 
+
 class UserProfile(models.Model):
     """User profile to store additional details"""
 
@@ -39,7 +40,6 @@ class UserProfile(models.Model):
         return self.full_name
 
 
-
 class UserSkill(models.Model):
     """Model to store individual user skills with verification status"""
 
@@ -73,7 +73,6 @@ class UserProject(models.Model):
 
     def __str__(self):
         return f"{self.user_profile.full_name} - {self.title}"
-
 
 
 class Team(models.Model):
@@ -163,7 +162,6 @@ class JoinRequest(models.Model):
         return f"{self.user.username} -> {self.team.name} ({self.status})"
 
 
-
 class Room(models.Model):
     # ROOM_TYPES = [
     #     ("PUBLIC", "Public"),
@@ -185,7 +183,8 @@ class Room(models.Model):
             Message.objects.create(room=self, sender=user, content=content)
         else:
             raise ValueError("User must be a member of the chatroom to send messages.")
-    
+
+
 class Message(models.Model):
     """Chat messages"""
 
@@ -193,3 +192,8 @@ class Message(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
+
+
+class UploadedPDF(models.Model):
+    file = models.FileField(upload_to="pdfs/")
+    uploaded_at = models.DateTimeField(auto_now_add=True)

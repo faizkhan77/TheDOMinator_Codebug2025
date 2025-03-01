@@ -24,6 +24,9 @@ import Invitations from './pages/Invitations';
 import RecommendedContent from './pages/RecommendedContent';
 import SkillAssessmentPage from './components/SkillAssessmentPage';
 
+import PDFChat from './pages/PDFChat';
+import UploadPDF from './pages/UploadPDF';
+
 const App = () => {
   return (
 
@@ -57,6 +60,11 @@ const App = () => {
             <Route path='/invitations' element={<Invitations />} />
             <Route path="/recommended-content" element={<RecommendedContent />} />
             <Route path="/assessment/:skill" element={<SkillAssessmentPage />} />
+
+
+            <Route path="/uploadpdf" element={<UploadPDF />} />
+
+            <Route path="/pdfchat" element={<PDFChat />} />
 
 
           </Routes>

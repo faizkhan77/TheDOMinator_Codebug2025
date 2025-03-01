@@ -1,6 +1,16 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import UserProfile, Team, Room, Message, Invitation, UserSkill, JoinRequest, UserProject
+from .models import (
+    UserProfile,
+    Team,
+    Room,
+    Message,
+    Invitation,
+    UserSkill,
+    JoinRequest,
+    UserProject,
+    UploadedPDF,
+)
 
 
 class UserSkillSerializer(serializers.ModelSerializer):
@@ -31,7 +41,7 @@ class UserSkillSerializer(serializers.ModelSerializer):
 
 class UserProjectSerializer(serializers.ModelSerializer):
     """Serializer for UserProject model"""
-    
+
     # profile = UserProfileSerializer()  # Nesting UserProfile data
 
     class Meta:
@@ -48,7 +58,12 @@ class UserProjectSerializer(serializers.ModelSerializer):
             "updated",
             # "profile"
         ]
-        read_only_fields = ["id", "created", "updated"]  # Prevent modification of these fields
+        read_only_fields = [
+            "id",
+            "created",
+            "updated",
+        ]  # Prevent modification of these fields
+
 
 class UserProfileSerializer(serializers.ModelSerializer):
     """Serializer for UserProfile model"""
@@ -59,7 +74,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     # Skills should be writable now
     skills = UserSkillSerializer(many=True, required=False)
-    
+
     projects = UserProjectSerializer(many=True, required=False)
 
     class Meta:
@@ -82,7 +97,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "email",
             "bio",
             "location",
-            "projects"
+            "projects",
         ]
         read_only_fields = ["created", "updated"]
 
@@ -115,7 +130,6 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id", "username", "email", "profile"]
-        
 
 
 class TeamSerializer(serializers.ModelSerializer):
@@ -192,3 +206,9 @@ class MessageSerializer(serializers.ModelSerializer):
         model = Message
         fields = ["id", "room", "sender", "content", "timestamp"]
         read_only_fields = ["timestamp"]
+
+
+class PDFSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UploadedPDF
+        fields = "__all__"

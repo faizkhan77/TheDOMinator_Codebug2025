@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework.decorators import api_view,  permission_classes
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import viewsets, permissions
@@ -15,7 +15,17 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
-from .models import UserProfile, Team, Room, Message, Invitation, UserSkill, JoinRequest, UserProject
+from .models import (
+    UserProfile,
+    Team,
+    Room,
+    Message,
+    Invitation,
+    UserSkill,
+    JoinRequest,
+    UserProject,
+    UploadedPDF,
+)
 from .serializers import (
     UserSerializer,
     UserProfileSerializer,
@@ -25,10 +35,12 @@ from .serializers import (
     InvitationSerializer,
     UserSkillSerializer,
     JoinRequestSerializer,
-    UserProjectSerializer
+    UserProjectSerializer,
+    PDFSerializer,
 )
 
 # Create your views here.
+
 
 @api_view(["GET"])
 def getRoutes(request):
@@ -224,6 +236,7 @@ class UserSkillViewSet(viewsets.ViewSet):
                 {"error": "Skill not found"}, status=status.HTTP_404_NOT_FOUND
             )
 
+
 class UserProjectViewSet(viewsets.ModelViewSet):
     """ViewSet for managing User Projects"""
 
@@ -237,6 +250,7 @@ class UserProjectViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """Set the user profile when a project is created"""
         serializer.save(user_profile=self.request.user.profile)
+
 
 # ✅ Team ViewSet
 class TeamViewSet(viewsets.ModelViewSet):
@@ -318,6 +332,7 @@ class TeamViewSet(viewsets.ModelViewSet):
         return Response(
             {"detail": "You have left the team."}, status=status.HTTP_200_OK
         )
+
 
 class InvitationViewSet(viewsets.ModelViewSet):
     queryset = Invitation.objects.all()
@@ -473,9 +488,6 @@ class JoinRequestViewSet(viewsets.ModelViewSet):
         return Response({"detail": message}, status=status.HTTP_200_OK)
 
 
-
-
-
 # ✅ Room (Chatroom) ViewSet
 class RoomViewSet(viewsets.ModelViewSet):
     queryset = Room.objects.all()
@@ -492,6 +504,7 @@ class RoomViewSet(viewsets.ModelViewSet):
         return Response(
             MessageSerializer(messages, many=True).data, status=status.HTTP_200_OK
         )
+
 
 class MessageViewSet(viewsets.ModelViewSet):
     """Handles CRUD for chat messages"""
@@ -658,3 +671,121 @@ def recommend_users(request, team_id):
     ]
 
     return Response({"recommended_users": recommended_users})
+
+
+################################# PDF CHAT ###############
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser
+
+
+from langchain_community.document_loaders import PyPDFLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import FAISS
+
+# from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
+
+import os
+from django.conf import settings
+
+from rest_framework.decorators import api_view
+from langchain.chains import RetrievalQA
+
+# from langchain_community.chat_models import ChatOpenAI
+# from langchain_openai import ChatOpenAI
+from langchain_google_vertexai import ChatVertexAI
+
+
+class PDFUploadView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    def post(self, request, *args, **kwargs):
+        file_serializer = PDFSerializer(data=request.data)
+
+        if file_serializer.is_valid():
+            file_serializer.save()
+            return Response(file_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+VECTOR_DB_PATH = "vectorstore"
+
+if not os.path.exists(os.path.join(VECTOR_DB_PATH, "index.faiss")):
+    print("FAISS index not found. Please process PDFs first.")
+
+
+def process_pdf(pdf_path):
+    loader = PyPDFLoader(pdf_path)
+    pages = loader.load()
+
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+    docs = text_splitter.split_documents(pages)
+
+    embedding_model = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
+    )
+
+    db = FAISS.from_documents(docs, embedding_model)
+    db.save_local(VECTOR_DB_PATH)
+
+
+def process_all_pdfs():
+    pdfs = UploadedPDF.objects.all()
+    all_docs = []
+
+    for pdf in pdfs:
+        pdf_path = os.path.join(settings.MEDIA_ROOT, str(pdf.file))
+        loader = PyPDFLoader(pdf_path)
+        pages = loader.load()
+
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+        docs = text_splitter.split_documents(pages)
+
+        all_docs.extend(docs)  # Collect all docs to create a single FAISS index
+
+    if all_docs:
+        embedding_model = HuggingFaceEmbeddings(
+            model_name="sentence-transformers/all-MiniLM-L6-v2"
+        )
+        db = FAISS.from_documents(all_docs, embedding_model)
+        db.save_local(VECTOR_DB_PATH)
+        print("FAISS index successfully created!")
+    else:
+        print("No documents found. FAISS index not created.")
+
+
+@api_view(["POST"])
+def chat_with_pdfs(request):
+    question = request.data.get("question", "")
+
+    if not question:
+        return Response({"error": "No question provided"}, status=400)
+
+    if not os.path.exists(os.path.join(VECTOR_DB_PATH, "index.faiss")):
+        return Response(
+            {"error": "FAISS index not found. Process PDFs first."}, status=400
+        )
+
+    embedding_model = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
+    )
+    db = FAISS.load_local(
+        VECTOR_DB_PATH, embedding_model, allow_dangerous_deserialization=True
+    )
+
+    retriever = db.as_retriever()
+    qa = RetrievalQA.from_chain_type(
+        llm=ChatVertexAI(
+            model_name="gemini-1.5-flash",
+            temperature=0.2,
+            google_api_key="AIzaSyAXXleKQS6ljOgXLSIoVxV1RuMjrPNmjDo",  # Directly placing the API key
+        ),
+        chain_type="stuff",
+        retriever=retriever,
+    )
+
+    answer = qa.run(question)
+    return Response({"answer": answer})
