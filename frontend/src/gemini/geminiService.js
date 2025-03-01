@@ -3,20 +3,11 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const API_KEY = import.meta.env.VITE_API_KEY;
 const genAI = new GoogleGenerativeAI(API_KEY);
 
-const listModels = async () => {
-  try {
-    const response = await genAI.listModels();
-    console.log("Available models:", response.models);
-  } catch (error) {
-    console.error("Error listing models:", error);
-  }
-};
-
 export const getQuestions = async (skill) => {
   try {
     // listModels();
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-    const prompt = `Ask 15 theoretical technical questions related to ${skill}, without any introduction or explanation.
+    const prompt = `Ask 5 theoretical technical questions related to ${skill}, without any introduction or explanation.
 Only provide the questions in the format:
 1. Question...
 2. Question...
@@ -32,7 +23,7 @@ Only provide the questions in the format:
       .split("\n")
       .map((q) => q.trim())
       .filter((q) => q)
-      .slice(0, 15);
+      .slice(0, 5);
   } catch (error) {
     console.error("Error fetching questions:", error);
     return ["Error fetching questions. Please try again later."];
