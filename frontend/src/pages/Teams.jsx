@@ -96,7 +96,7 @@ const Teams = () => {
 
     {/* Create Team Button */}
     <Link to="/team/new">
-        <button className="w-full p-3 bg-primary text-white font-semibold rounded-lg mb-6 hover:bg-primary-dark transition duration-300">
+        <button className="w-full p-3 bg-[#141414] text-white font-semibold rounded-lg mb-6 hover:bg-primary-dark transition duration-300 ">
             Create Team
         </button>
     </Link>
