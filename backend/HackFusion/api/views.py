@@ -11,8 +11,6 @@ from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 from .models import (
@@ -37,6 +35,18 @@ from .serializers import (
     JoinRequestSerializer,
     UserProjectSerializer,
     PDFSerializer,
+    CreateJoinRequestSerializer,
+)
+from .models import ChatSession, UploadedPDF
+import numpy as np
+from numpy.linalg import norm
+from langchain_huggingface import HuggingFaceEmbeddings
+from .rag_pipeline import process_pdfs_for_session, get_answer_from_rag
+
+
+# Initialize the embedding model globally (or within the functions, but globally is more efficient)
+embedding_model = HuggingFaceEmbeddings(
+    model_name="sentence-transformers/all-MiniLM-L6-v2"
 )
 
 # Create your views here.
@@ -407,43 +417,37 @@ class InvitationViewSet(viewsets.ModelViewSet):
 
 class JoinRequestViewSet(viewsets.ModelViewSet):
     queryset = JoinRequest.objects.all()
-    serializer_class = JoinRequestSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def create(self, request):
-        """Allow a user to request to join a private team."""
-        user = request.user
-        team_id = request.data.get("team_id")
+    def get_serializer_class(self):
+        """
+        Use a different serializer for creating vs. reading join requests.
+        """
+        if self.action == 'create':
+            return CreateJoinRequestSerializer
+        return JoinRequestSerializer
 
-        # Check if team exists
-        team = get_object_or_404(Team, id=team_id)
+    def perform_create(self, serializer):
+        """
+        This method is called by DRF after validation and before saving.
+        It's the perfect place for our custom logic and validation checks.
+        """
+        team = serializer.validated_data['team']
+        user = self.request.user
 
-        # Prevent sending request if already a member
+        # --- Add validation checks ---
         if team.members.filter(id=user.id).exists():
-            return Response(
-                {"detail": "You are already a member of this team."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        # Only allow requests for private teams
+            # Use DRF's standard way of raising validation errors
+            raise serializers.ValidationError({"detail": "You are already a member of this team."})
+        
         if team.team_type != "PRIVATE":
-            return Response(
-                {"detail": "Join requests are only allowed for private teams."},
-                status=status.HTTP_403_FORBIDDEN,
-            )
+            raise serializers.ValidationError({"detail": "Join requests are only for private teams."})
 
-        # Prevent duplicate requests
         if JoinRequest.objects.filter(user=user, team=team, status="pending").exists():
-            return Response(
-                {"detail": "Join request already pending."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            raise serializers.ValidationError({"detail": "You have already sent a join request to this team."})
 
-        # Create join request
-        join_request = JoinRequest.objects.create(user=user, team=team)
-        return Response(
-            JoinRequestSerializer(join_request).data, status=status.HTTP_201_CREATED
-        )
+        # If all checks pass, save the instance with the current user.
+        serializer.save(user=self.request.user)
 
     @action(detail=True, methods=["post"])
     def respond(self, request, pk=None):
@@ -574,48 +578,48 @@ def kick_member_from_team(request, team_id):
 
 
 @api_view(["GET"])
-@permission_classes([AllowAny])
+@permission_classes([permissions.IsAuthenticated]) # Ensure authentication is required
 def recommend_teams(request):
-    """API endpoint to recommend teams based on user profile."""
+    """API endpoint to recommend teams based on user profile's skills and role."""
     user = request.user
-    if not user.is_authenticated:
-        return JsonResponse({"error": "User is not authenticated"}, status=401)
-
     try:
         user_profile = UserProfile.objects.get(user=user)
     except UserProfile.DoesNotExist:
-        return JsonResponse({"error": "User profile not found"}, status=404)
+        return Response({"error": "User profile not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    # Fetch the user's skills correctly by joining them into a string
-    user_skills = " ".join(
-        [skill.skill_name.lower() for skill in user_profile.skills.all()]
-    )
+    # 1. Prepare user data
+    user_skills = " ".join([skill.skill_name.lower() for skill in user_profile.skills.all()])
     user_role = (user_profile.role or "").lower()
-    user_data = user_skills + " " + user_role  # Combine role and skills
+    user_data = user_skills + " " + user_role
+    
+    # Check if user data is sufficient
+    if not user_data.strip():
+        return Response({"recommended_teams": []})
 
-    # Fetch all teams
+    # 2. Get all teams
     teams = Team.objects.all()
     if not teams.exists():
-        return JsonResponse({"error": "No teams found"}, status=404)
+        return Response({"error": "No teams found"}, status=status.HTTP_404_NOT_FOUND)
 
-    # Ensure `looking_for` and `description` are not None
+    # 3. Prepare team data for embedding
     team_data = [
         (team.looking_for or "").lower() + " " + (team.description or "").lower()
         for team in teams
     ]
 
-    # Vectorizing the text data using TF-IDF
-    vectorizer = TfidfVectorizer()
-    vectors = vectorizer.fit_transform([user_data] + team_data)
+    # 4. Generate embeddings (User and Teams)
+    user_embedding = embedding_model.embed_documents([user_data])[0]
+    team_embeddings = embedding_model.embed_documents(team_data)
 
-    # Compute cosine similarity between user profile and all teams
-    similarities = cosine_similarity(vectors[0], vectors[1:]).flatten()
+    # 5. Calculate Cosine Similarity (using numpy)
+    # Cosine similarity between A and B = dot(A, B) / (norm(A) * norm(B))
+    similarities = np.dot(team_embeddings, user_embedding) / (norm(team_embeddings, axis=1) * norm(user_embedding))
 
-    # Sort teams based on similarity scores
+    # 6. Sort teams based on similarity scores
     team_scores = list(zip(teams, similarities))
     team_scores.sort(key=lambda x: x[1], reverse=True)
 
-    # Serialize top 5 recommended teams
+    # 7. Serialize top 5 recommended teams (only if similarity > 0)
     recommended_teams = TeamSerializer(
         [team for team, score in team_scores[:5] if score > 0], many=True
     ).data
@@ -624,27 +628,26 @@ def recommend_teams(request):
 
 
 @api_view(["GET"])
-@permission_classes([AllowAny])
+@permission_classes([permissions.IsAuthenticated]) # Ensure authentication is required
 def recommend_users(request, team_id):
-    """API endpoint to recommend users based on a team's description and looking_for field."""
+    """API endpoint to recommend users based on a team's needs."""
     try:
         team = Team.objects.get(id=team_id)
     except Team.DoesNotExist:
-        return Response({"error": "Team not found"}, status=404)
+        return Response({"error": "Team not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    # Ensure `looking_for` and `description` are not None
-    team_description = (team.description or "").lower()
-    team_looking_for = (team.looking_for or "").lower()
-    team_data = (
-        team_description + " " + team_looking_for
-    )  # Combine description and looking_for
+    # 1. Prepare team data
+    team_data = (team.looking_for or "").lower() + " " + (team.description or "").lower()
+    
+    if not team_data.strip():
+        return Response({"recommended_users": []})
 
-    # Fetch all user profiles
+    # 2. Get all user profiles
     users = UserProfile.objects.all()
     if not users.exists():
-        return Response({"error": "No users found"}, status=404)
+        return Response({"error": "No users found"}, status=status.HTTP_404_NOT_FOUND)
 
-    # Ensure `role` and `skills` are not None for each user
+    # 3. Prepare user profile data for embedding
     user_data = [
         (user.role or "").lower()
         + " "
@@ -652,140 +655,86 @@ def recommend_users(request, team_id):
         for user in users
     ]
 
-    # Vectorizing the text data using TF-IDF
-    vectorizer = TfidfVectorizer()
-    vectors = vectorizer.fit_transform([team_data] + user_data)
+    # 4. Generate embeddings (Team and Users)
+    team_embedding = embedding_model.embed_documents([team_data])[0]
+    user_embeddings = embedding_model.embed_documents(user_data)
 
-    # Compute cosine similarity between team and all users
-    similarities = cosine_similarity(vectors[0], vectors[1:]).flatten()
+    # 5. Calculate Cosine Similarity
+    similarities = np.dot(user_embeddings, team_embedding) / (norm(user_embeddings, axis=1) * norm(team_embedding))
 
-    # Sort users based on similarity scores
+    # 6. Sort users based on similarity scores
     user_scores = list(zip(users, similarities))
     user_scores.sort(key=lambda x: x[1], reverse=True)
 
-    # Serialize top 5 recommended users
+    # 7. Serialize top 5 recommended users (only if similarity > 0)
     recommended_users = [
         UserProfileSerializer(user).data
         for user, score in user_scores[:5]
-        if score > 0  # Ensure only relevant users are shown
+        if score > 0
     ]
 
     return Response({"recommended_users": recommended_users})
 
-
 ################################# PDF CHAT ###############
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.parsers import MultiPartParser, FormParser
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def upload_and_process_pdfs(request):
+    """
+    Handles uploading multiple PDFs and creates a chat session.
+    Processing is now deferred until the first question.
+    """
+    files = request.FILES.getlist('files')
+    if not files:
+        return Response({"error": "No files provided"}, status=status.HTTP_400_BAD_REQUEST)
 
+    session = ChatSession.objects.create()
+    for f in files:
+        UploadedPDF.objects.create(session=session, file=f)
+    
+    # Just return the session ID. The client will use this for the chat.
+    return Response({"session_id": str(session.id)}, status=status.HTTP_201_CREATED)
 
-from langchain_community.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import FAISS
-
-# from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_huggingface import HuggingFaceEmbeddings
-
-import os
-from django.conf import settings
-
-from rest_framework.decorators import api_view
-from langchain.chains import RetrievalQA
-
-# from langchain_community.chat_models import ChatOpenAI
-# from langchain_openai import ChatOpenAI
-from langchain_google_vertexai import ChatVertexAI
-
-
-class PDFUploadView(APIView):
-    parser_classes = (MultiPartParser, FormParser)
-
-    def post(self, request, *args, **kwargs):
-        file_serializer = PDFSerializer(data=request.data)
-
-        if file_serializer.is_valid():
-            file_serializer.save()
-            return Response(file_serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-VECTOR_DB_PATH = "vectorstore"
-
-if not os.path.exists(os.path.join(VECTOR_DB_PATH, "index.faiss")):
-    print("FAISS index not found. Please process PDFs first.")
-
-
-def process_pdf(pdf_path):
-    loader = PyPDFLoader(pdf_path)
-    pages = loader.load()
-
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
-    docs = text_splitter.split_documents(pages)
-
-    embedding_model = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2"
-    )
-
-    db = FAISS.from_documents(docs, embedding_model)
-    db.save_local(VECTOR_DB_PATH)
-
-
-def process_all_pdfs():
-    pdfs = UploadedPDF.objects.all()
-    all_docs = []
-
-    for pdf in pdfs:
-        pdf_path = os.path.join(settings.MEDIA_ROOT, str(pdf.file))
-        loader = PyPDFLoader(pdf_path)
-        pages = loader.load()
-
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
-        docs = text_splitter.split_documents(pages)
-
-        all_docs.extend(docs)  # Collect all docs to create a single FAISS index
-
-    if all_docs:
-        embedding_model = HuggingFaceEmbeddings(
-            model_name="sentence-transformers/all-MiniLM-L6-v2"
-        )
-        db = FAISS.from_documents(all_docs, embedding_model)
-        db.save_local(VECTOR_DB_PATH)
-        print("FAISS index successfully created!")
-    else:
-        print("No documents found. FAISS index not created.")
-
-
-@api_view(["POST"])
-def chat_with_pdfs(request):
-    question = request.data.get("question", "")
-
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def ask_question(request, session_id):
+    """
+    Takes a question, ensures PDFs are processed, gets the RAG answer.
+    """
+    question = request.data.get("question")
     if not question:
-        return Response({"error": "No question provided"}, status=400)
+        return Response({"error": "Question not provided"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        # Step 1: Ensure documents are processed. This is idempotent.
+        process_pdfs_for_session(session_id)
+        
+        # Step 2: Get the answer using the robust RAG function.
+        answer = get_answer_from_rag(session_id, question)
+        
+        return Response({"answer": answer})
 
-    if not os.path.exists(os.path.join(VECTOR_DB_PATH, "index.faiss")):
-        return Response(
-            {"error": "FAISS index not found. Process PDFs first."}, status=400
-        )
+    except Exception as e:
+        error_message = f"An error occurred: {e}"
+        print(f"Error in ask_question view for session {session_id}: {error_message}")
+        return Response({"error": error_message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    embedding_model = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2"
-    )
-    db = FAISS.load_local(
-        VECTOR_DB_PATH, embedding_model, allow_dangerous_deserialization=True
-    )
 
-    retriever = db.as_retriever()
-    qa = RetrievalQA.from_chain_type(
-        llm=ChatVertexAI(
-            model_name="gemini-1.5-flash",
-            temperature=0.2,
-            google_api_key="AIzaSyAXXleKQS6ljOgXLSIoVxV1RuMjrPNmjDo",  # Directly placing the API key
-        ),
-        chain_type="stuff",
-        retriever=retriever,
-    )
 
-    answer = qa.run(question)
-    return Response({"answer": answer})
+# Add this new view function anywhere in the file
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def get_session_pdfs(request, session_id):
+    """
+    Retrieves the list of PDF files for a given chat session.
+    """
+    try:
+        session = ChatSession.objects.get(id=session_id)
+        pdfs = session.pdfs.all()
+        # Pass the request context to the serializer to build full URLs
+        serializer = PDFSerializer(pdfs, many=True, context={'request': request})
+        return Response(serializer.data)
+    except ChatSession.DoesNotExist:
+        return Response({"error": "Session not found"}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

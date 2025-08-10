@@ -69,18 +69,19 @@
 }
 
 #nav-bar {
-    position: fixed; /* Changed from absolute to fixed */
-    left: 1vw;
-    top: 1vw;
-    height: calc(100% - 2vw);
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh; /* Full height */
     background: var(--navbar-dark-primary);
-    border-radius: 16px;
+    border-radius: 0; /* Remove the radius for a seamless edge */
     display: flex;
     flex-direction: column;
     color: var(--navbar-light-primary);
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     overflow: hidden;
     user-select: none;
+    z-index: 50; /* Ensure it's on top */
 }
 
 

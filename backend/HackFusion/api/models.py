@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import uuid
 
 # Create your models here.
 
@@ -195,5 +196,20 @@ class Message(models.Model):
 
 
 class UploadedPDF(models.Model):
+    file = models.FileField(upload_to="pdfs/")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+
+class ChatSession(models.Model):
+    """Represents a single PDF chat session."""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"ChatSession {self.id}"
+
+# Modify the existing UploadedPDF model
+class UploadedPDF(models.Model):
+    session = models.ForeignKey(ChatSession, related_name='pdfs', on_delete=models.CASCADE, null=True, blank=True)
     file = models.FileField(upload_to="pdfs/")
     uploaded_at = models.DateTimeField(auto_now_add=True)

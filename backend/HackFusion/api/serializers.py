@@ -12,6 +12,15 @@ from .models import (
     UploadedPDF,
 )
 
+class CreateJoinRequestSerializer(serializers.ModelSerializer):
+    """
+    Serializer specifically for CREATING a join request.
+    It only requires the team ID.
+    """
+    class Meta:
+        model = JoinRequest
+        fields = ['team'] # The frontend will send a field named 'team' with the team's ID
+
 
 class UserSkillSerializer(serializers.ModelSerializer):
     """Serializer for UserSkill model"""
@@ -209,6 +218,20 @@ class MessageSerializer(serializers.ModelSerializer):
 
 
 class PDFSerializer(serializers.ModelSerializer):
+    url = serializers.SerializerMethodField()
+    filename = serializers.SerializerMethodField()
+
     class Meta:
         model = UploadedPDF
-        fields = "__all__"
+        fields = ["id", "filename", "url", "uploaded_at"]
+
+    def get_url(self, obj):
+        request = self.context.get('request')
+        if request and obj.file:
+            return request.build_absolute_uri(obj.file.url)
+        return None
+    
+    def get_filename(self, obj):
+        # Extracts a clean filename from the path
+        import os
+        return os.path.basename(obj.file.name)
